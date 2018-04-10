@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This file is compatible with Silverlight-->
+<Canvas xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+        Canvas.Left="0" 
+        Canvas.Top="0" 
+        Width="512" 
+        Height="512">
+    <Canvas.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard>
+                <Storyboard AutoReverse="True">
+                    <DoubleAnimation >
+                        
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Canvas.Triggers>
+    
+      <Ellipse Canvas.Left="0" 
+               Canvas.Top="0" 
+               Width="512" 
+               Height="512"
+               Fill="{StaticResource PrimaryHueMidBrush}"/>
+
+    <Path Fill="{StaticResource PrimaryHueDarkBrush}" 
+          Data="M326.868 184.646L256 113.778L155.569 356.592l148.97 150.793C422.709 484.702 512 380.787 512 256  c0-0.876-0.024-1.746-0.033-2.62L386.272 128.243L326.868 184.646z"/>
+  
+    <Path Fill="#FFFFC91B" 
+          Data="M256 256V113.778c-78.546 0-142.222 63.674-142.222 142.222c0 78.546 63.676 142.222 142.222 142.222  c28.946 0 55.858-8.67 78.322-23.523L256 256z"/>
+  
+    <Path Fill="#FFFFD05A" 
+          Data="M256 256V113.778c-78.546 0-142.222 63.674-142.222 142.222c0 78.546 63.676 142.222 142.222 142.222  V256z"/>
+  
+    <Path Fill="#FFFFEDB5" 
+          Data="M398.222 256H256l78.322 118.7C372.815 349.248 398.222 305.6 398.222 256z"/>
+  
+    <Path Fill="#FFFF5419" 
+          Data="M426.227 227.00c0-78.546-63.676-142.222-142.222-142.222v142.222H426.667z"/>
+
+</Canvas>

@@ -1,0 +1,272 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient.Themes"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:views="clr-namespace:StatisticalAnalysis.WpfClient.Views"
+                    xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Style x:Key="ControlButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="wpf:RippleAssist.Feedback" Value="{DynamicResource MaterialDesignFlatButtonRipple}" />
+        <Setter Property="TextBlock.FontWeight" Value="Medium"/>
+        <Setter Property="TextBlock.FontSize" Value="14"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="8 4 8 4"/>
+        <Setter Property="Opacity" Value="0.53"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}" 
+                                x:Name="border"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <wpf:Ripple Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Focusable="False"    
+                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Padding="{TemplateBinding Padding}" 
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsDefaulted" Value="true">
+                            <!--Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/-->
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
+                            <Setter Property="Opacity" Value="1"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Opacity" Value="0.23"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <ControlTemplate x:Key="PrimaryWindowTemplate" TargetType="{x:Type views:MainWindow}">
+
+        <Border x:Name="PART_Container"
+                Background="{TemplateBinding Background}">
+
+            <AdornerDecorator>
+
+                <materialDesign:DialogHost Identifier="RootDialog">
+
+                    <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+                        <materialDesign:DrawerHost.LeftDrawerContent>
+                            <DockPanel MinWidth="212">
+                                <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                                              DockPanel.Dock="Top"
+                                              HorizontalAlignment="Right" 
+                                              Margin="16"
+                                              IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
+                                <ListBox x:Name="DemoItemsListBox" 
+                                         Margin="0 16 0 16" 
+                                         SelectedIndex="0"                         
+                                         ItemsSource="{Binding DemoItems}">
+                                    <!--<ListBox.ItemTemplate>
+                                        <DataTemplate DataType="domain:DemoItem">
+                                            <TextBlock Text="{Binding Name}" Margin="32 0 32 0" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>-->
+                                </ListBox>
+                            </DockPanel>
+                        </materialDesign:DrawerHost.LeftDrawerContent>
+
+                        <Grid ClipToBounds="True"
+                              SnapsToDevicePixels="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!--#region Header-->
+
+                            <Border x:Name="PART_Header"
+                                    Grid.Row="0"
+                                    Background="{DynamicResource PrimaryHueDarkBrush}">
+
+                                <StackPanel x:Name="ControllButtons"
+                                            Orientation="Horizontal" 
+                                            HorizontalAlignment="Right" 
+                                            VerticalAlignment="Top" 
+                                            WindowChrome.IsHitTestVisibleInChrome="True">
+
+                                    <!--#region Minimize button-->
+                                    <Button x:Name="BtnMin"
+                                            Style="{StaticResource ControlButtonStyle}"
+                                            VerticalContentAlignment="Bottom"
+                                            Command="{Binding MinimizeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:MainWindow}}}">
+
+                                        <materialDesign:PackIcon
+                                                Kind="WindowMinimize"/>
+
+                                    </Button>
+                                    <!--#endregion-->
+
+                                    <!--#region Maximize button-->
+                                    <Button x:Name="BtnMax"
+                                            Style="{StaticResource ControlButtonStyle}"
+                                            Command="{Binding MaximizeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:MainWindow}}}">
+
+                                        <materialDesign:PackIcon
+                                                x:Name="BtnMaxIcon"
+                                                Kind="WindowMaximize"/>
+
+                                    </Button>
+                                    <!--#endregion-->
+
+                                    <!--#region Close button-->
+                                    <Button x:Name="BtnClose"
+                                            Style="{StaticResource ControlButtonStyle}"
+                                            Command="{Binding CloseCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:MainWindow}}}">
+
+                                        <materialDesign:PackIcon 
+                                                Kind="WindowClose"/>
+
+                                    </Button>
+                                    <!--#endregion-->
+
+                                </StackPanel>
+
+                            </Border>
+
+                            <!--#endregion-->
+
+                            <ContentPresenter x:Name="mainWindowContent"
+                                              Grid.Row="1"
+                                              Panel.ZIndex="-1"
+                                              WindowChrome.IsHitTestVisibleInChrome="True"/>
+
+                        </Grid>
+
+                    </materialDesign:DrawerHost>
+
+                </materialDesign:DialogHost>
+
+            </AdornerDecorator>
+
+        </Border>
+
+        <ControlTemplate.Triggers>
+
+            <Trigger Property="WindowState" Value="Maximized">
+                <Setter TargetName="BtnMaxIcon" Property="Kind" Value="WindowRestore"/>
+            </Trigger>
+
+            <Trigger Property="views:MainWindow.IsBusy" Value="true">
+
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+
+                            <ColorAnimation To="#FFfafafa"
+                                            Storyboard.TargetName="PART_Header"
+                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                            Duration="0:0:0.4"/>
+
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+
+                <Trigger.ExitActions>
+
+                    <BeginStoryboard>
+                        <Storyboard>
+
+                            <ColorAnimation To="{StaticResource Primary700}"
+                                            Storyboard.TargetName="PART_Header"
+                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                            Duration="0:0:0.4"/>
+
+                        </Storyboard>
+                    </BeginStoryboard>
+
+                </Trigger.ExitActions>
+
+                <Setter TargetName="BtnMin" Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                <Setter TargetName="BtnMax" Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                <Setter TargetName="BtnClose" Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                <Setter TargetName="mainWindowContent" Property="Content">
+                    <Setter.Value>
+
+                        <Grid Grid.Row="1" 
+                              HorizontalAlignment="Center" 
+                              VerticalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <materialDesign:TransitioningContent x:Name="waitPageIcon"
+                                                                 Visibility="Collapsed"
+                                                                 Grid.Row="0"
+                                                                 Margin="0 0 0 30"
+                                                                 OpeningEffectsOffset="{materialDesign:IndexedItemOffsetMultiplier 0:1:50}">
+                                <materialDesign:TransitioningContent.OpeningEffects>
+                                    <materialDesign:TransitionEffect Kind="ExpandIn" OffsetTime="{materialDesign:IndexedItemOffsetMultiplier 0:0:5}"/>
+                                    <materialDesign:TransitionEffect Kind="FadeIn" OffsetTime="{materialDesign:IndexedItemOffsetMultiplier 0:0:5}"/>
+                                </materialDesign:TransitioningContent.OpeningEffects>
+
+                                <views:AnimatedIcon/>
+
+                            </materialDesign:TransitioningContent>
+
+                            <materialDesign:TransitioningContent x:Name="waitPageTitle"
+                                                                 Visibility="Collapsed"
+                                                                 Grid.Row="1"
+                                                                 OpeningEffectsOffset="{materialDesign:IndexedItemOffsetMultiplier 0:1:50}">
+                                <materialDesign:TransitioningContent.OpeningEffects>
+                                    <materialDesign:TransitionEffect Kind="SlideInFromBottom"/>
+                                    <materialDesign:TransitionEffect Kind="FadeIn"/>
+                                </materialDesign:TransitioningContent.OpeningEffects>
+
+                                <TextBlock Style="{StaticResource MaterialDesignTitleTextBlock}"
+                                           Opacity="0.5"
+                                           Text="MATH STATS" 
+                                           HorizontalAlignment="Center"/>
+
+                            </materialDesign:TransitioningContent>
+
+                        </Grid>
+
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Key="MainWindowStyle" TargetType="{x:Type views:MainWindow}">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
+        <Setter Property="Foreground" Value="{DynamicResource WindowText}"/>
+        <Setter Property="ResizeMode" Value="CanResize"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                
+                <WindowChrome CornerRadius="0"                                     
+                              GlassFrameThickness="1" 
+                              ResizeBorderThickness="7"
+                              CaptionHeight="32"/>
+                
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template" Value="{StaticResource PrimaryWindowTemplate}"/>
+    </Style>
+
+</ResourceDictionary>
