@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
+             Background="{DynamicResource MaterialDesignLightBackground}"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <TextBlock Text="Hello World!" 
@@ -21,7 +22,7 @@
             Width="24" />
         </Button>
 
-        <Separator Style="{StaticResource MaterialDesignLightSeparator}"/>
+        <Separator Style="{StaticResource MaterialDesignDarkSeparator}"/>
 
     </Grid>
 </UserControl>

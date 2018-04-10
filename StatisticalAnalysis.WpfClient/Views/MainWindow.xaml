@@ -48,7 +48,7 @@
 
                     <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}"
                                   DockPanel.Dock="Left"
-                                  IsChecked="False"
+                                  IsChecked="True"
                                   Width="20"
                                   Height="20"
                                   x:Name="MenuToggleButton" 

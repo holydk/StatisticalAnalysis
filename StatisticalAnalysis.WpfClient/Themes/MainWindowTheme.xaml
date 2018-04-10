@@ -64,25 +64,82 @@
 
                 <materialDesign:DialogHost Identifier="RootDialog">
 
-                    <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+                    <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"
+                                               WindowChrome.IsHitTestVisibleInChrome="True">
                         <materialDesign:DrawerHost.LeftDrawerContent>
-                            <DockPanel MinWidth="212">
-                                <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
-                                              DockPanel.Dock="Top"
-                                              HorizontalAlignment="Right" 
-                                              Margin="16"
-                                              IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
-                                <ListBox x:Name="DemoItemsListBox" 
-                                         Margin="0 16 0 16" 
-                                         SelectedIndex="0"                         
-                                         ItemsSource="{Binding DemoItems}">
-                                    <!--<ListBox.ItemTemplate>
-                                        <DataTemplate DataType="domain:DemoItem">
-                                            <TextBlock Text="{Binding Name}" Margin="32 0 32 0" />
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>-->
-                                </ListBox>
-                            </DockPanel>
+                            <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}" 
+                                    BorderThickness="0,0,1,0">
+
+                                <DockPanel MinWidth="212">
+
+                                    <StackPanel DockPanel.Dock="Top"
+                                                Orientation="Horizontal"
+                                                Margin="16 12 16 0"
+                                                Height="48">
+
+                                        <views:AnimatedIcon HorizontalAlignment="Left"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0 10 0 0"
+                                                            Width="35">
+                                            <views:AnimatedIcon.RenderTransform>
+                                                <ScaleTransform ScaleX="0.2" ScaleY="0.2"/>
+                                            </views:AnimatedIcon.RenderTransform>
+                                        </views:AnimatedIcon>
+
+                                        <TextBlock Style="{StaticResource MaterialDesignSubheadingTextBlock}"                                                   
+                                                   Opacity="0.5"
+                                                   Margin="36 0 0 0"
+                                                   Text="MATH STATS" 
+                                                   VerticalAlignment="Center"
+                                                   />
+
+                                    </StackPanel>
+
+                                    <Separator DockPanel.Dock="Top" 
+                                               Style="{StaticResource MaterialDesignDarkSeparator}"/>
+
+                                    <ItemsControl ItemsSource="{Binding Items2}" Grid.IsSharedSizeScope="True">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type TextBlock}">
+                                                <Border x:Name="Border" Padding="12 0 12 0" BorderThickness="0 0 0 1" BorderBrush="{DynamicResource MaterialDesignDivider}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition SharedSizeGroup="Checkerz" />
+                                                            <ColumnDefinition />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <materialDesign:PackIcon
+                                                                Kind="InformationOutline"
+                                                                VerticalAlignment="Center"
+                                                                Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                                                Width="20"
+                                                                Height="20"/>
+
+                                                        <StackPanel Margin="12 0 0 0" Grid.Column="1">
+                                                            <TextBlock FontWeight="Bold" Text="{Binding Text}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+
+                                        <ItemsControl.Items>
+                                            <TextBlock Text="Test"/>
+                                        </ItemsControl.Items>
+                                        
+
+                                    </ItemsControl>
+
+                                    
+
+                                </DockPanel>
+
+                            </Border>
                         </materialDesign:DrawerHost.LeftDrawerContent>
 
                         <Grid ClipToBounds="True"
