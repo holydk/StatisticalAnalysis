@@ -76,11 +76,7 @@
                                          Margin="0 16 0 16" 
                                          SelectedIndex="0"                         
                                          ItemsSource="{Binding DemoItems}">
-                                    <!--<ListBox.ItemTemplate>
-                                        <DataTemplate DataType="domain:DemoItem">
-                                            <TextBlock Text="{Binding Name}" Margin="32 0 32 0" />
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>-->
+                                    
                                 </ListBox>
                             </DockPanel>
                         </materialDesign:DrawerHost.LeftDrawerContent>
