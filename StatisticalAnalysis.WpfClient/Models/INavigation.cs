@@ -13,6 +13,8 @@ namespace StatisticalAnalysis.WpfClient.Models
 
         event EventHandler<NavigationEventArgs> Navigated;
 
+        void Add<T>(Func<T> func) where T : UserControl;
+
         void GoTo<T>(Func<T> func) where T : UserControl;
         Task GoToAsync<T>(Func<T> func) where T : UserControl;
         Task GoToAsync(Type type);

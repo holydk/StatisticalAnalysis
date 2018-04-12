@@ -3,7 +3,8 @@
                     xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient.Themes"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:views="clr-namespace:StatisticalAnalysis.WpfClient.Views"
-                    xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes">
+                    xmlns:models="clr-namespace:StatisticalAnalysis.WpfClient.Models"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <Style x:Key="ControlButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
@@ -12,7 +13,7 @@
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}"/>
         <Setter Property="Focusable" Value="False"/>
-        <Setter Property="wpf:RippleAssist.Feedback" Value="{DynamicResource MaterialDesignFlatButtonRipple}" />
+        <Setter Property="materialDesign:RippleAssist.Feedback" Value="{DynamicResource MaterialDesignFlatButtonRipple}" />
         <Setter Property="TextBlock.FontWeight" Value="Medium"/>
         <Setter Property="TextBlock.FontSize" Value="14"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -27,7 +28,7 @@
                         <Border Background="{TemplateBinding Background}" 
                                 x:Name="border"
                                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <wpf:Ripple Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Focusable="False"    
+                            <materialDesign:Ripple Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Focusable="False"    
                                         HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" 
                                         VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                         Padding="{TemplateBinding Padding}" 
@@ -64,11 +65,11 @@
 
                 <materialDesign:DialogHost Identifier="RootDialog">
 
-                    <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}"
-                                               WindowChrome.IsHitTestVisibleInChrome="True">
+                    <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
                         <materialDesign:DrawerHost.LeftDrawerContent>
                             <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}" 
-                                    BorderThickness="0,0,1,0">
+                                    BorderThickness="0,0,1,0"
+                                    WindowChrome.IsHitTestVisibleInChrome="True">
 
                                 <DockPanel MinWidth="212">
 
@@ -88,20 +89,27 @@
 
                                         <TextBlock Style="{StaticResource MaterialDesignSubheadingTextBlock}"                                                   
                                                    Opacity="0.5"
-                                                   Margin="36 0 0 0"
+                                                   Margin="16 0 0 0"
                                                    Text="MATH STATS" 
-                                                   VerticalAlignment="Center"
-                                                   />
+                                                   VerticalAlignment="Center"/>
 
                                     </StackPanel>
 
                                     <Separator DockPanel.Dock="Top" 
                                                Style="{StaticResource MaterialDesignDarkSeparator}"/>
 
-                                    <ItemsControl ItemsSource="{Binding Items2}" Grid.IsSharedSizeScope="True">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate DataType="{x:Type TextBlock}">
-                                                <Border x:Name="Border" Padding="12 0 12 0" BorderThickness="0 0 0 1" BorderBrush="{DynamicResource MaterialDesignDivider}">
+                                    <ListBox DockPanel.Dock="Top"
+                                             x:Name="navListBox"
+                                             Grid.IsSharedSizeScope="True"
+                                             ItemsSource="{Binding NavigationItems}">
+                                        <ListBox.ItemTemplate>
+
+                                            <DataTemplate DataType="{x:Type models:INavigationItem}">
+
+                                                <Border x:Name="Border"
+                                                        Padding="12 0 12 0"
+                                                        BorderBrush="{DynamicResource MaterialDesignDivider}">
+
                                                     <Grid>
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition SharedSizeGroup="Checkerz" />
@@ -109,37 +117,89 @@
                                                         </Grid.ColumnDefinitions>
 
                                                         <materialDesign:PackIcon
-                                                                Kind="InformationOutline"
+                                                                Kind="{Binding IconKind}"
                                                                 VerticalAlignment="Center"
-                                                                Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
-                                                                Width="20"
-                                                                Height="20"/>
+                                                                Width="22"
+                                                                Height="22"/>
 
-                                                        <StackPanel Margin="12 0 0 0" Grid.Column="1">
-                                                            <TextBlock FontWeight="Bold" Text="{Binding Text}" />
-                                                        </StackPanel>
+                                                        <TextBlock x:Name="textTitle"
+                                                                   Text="{Binding Title}" 
+                                                                   Margin="12 0 0 0"
+                                                                   FontSize="14"
+                                                                   Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                                                   VerticalAlignment="Center"
+                                                                   Grid.Column="1"/>
+
                                                     </Grid>
+
                                                 </Border>
+
                                                 <DataTemplate.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+
+                                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="true">
+                                                        <Setter TargetName="Border" Property="TextElement.Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
                                                     </DataTrigger>
+                                                    
                                                 </DataTemplate.Triggers>
+                                                
                                             </DataTemplate>
+
+                                        </ListBox.ItemTemplate>
+
+                                    </ListBox>
+
+                                    <Separator DockPanel.Dock="Top" 
+                                               Style="{StaticResource MaterialDesignDarkSeparator}"/>
+
+                                    <ItemsControl ItemsSource="{Binding Links}"
+                                                  DockPanel.Dock="Top">
+                                        <ItemsControl.ItemTemplate>
+
+                                            <DataTemplate DataType="{x:Type models:ILink}">
+                                                
+                                                <Button x:Name="Root"
+                                                        Height="40"
+                                                        Padding="20 0 12 0"
+                                                        HorizontalContentAlignment="Left"
+                                                        ToolTip="{Binding ToolTip}" 
+                                                        ToolTipService.InitialShowDelay="0" 
+                                                        Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:MainWindow}}}"
+                                                        Style="{DynamicResource MaterialDesignFlatButton}"
+                                                        Command="{Binding DataContext.OpenLinkCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:MainWindow}}}"
+                                                        CommandParameter="{Binding}">
+
+                                                    <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Center">
+
+                                                        <materialDesign:PackIcon x:Name="PackIcon"
+                                                                                 Width="22"
+                                                                                 Height="22"
+                                                                                 Kind="{Binding IconKind}" />
+                                                        
+                                                        <TextBlock Margin="12 0 0 0"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="14"
+                                                                   Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                                                   Text="{Binding Title, Mode=OneWay}" />
+                                                        
+                                                    </StackPanel>
+                                                    
+                                                </Button>
+
+                                            </DataTemplate>
+                                            
                                         </ItemsControl.ItemTemplate>
-
-                                        <ItemsControl.Items>
-                                            <TextBlock Text="Test"/>
-                                        </ItemsControl.Items>
-                                        
-
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Vertical" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
                                     </ItemsControl>
-
-                                    
 
                                 </DockPanel>
 
                             </Border>
+                            
                         </materialDesign:DrawerHost.LeftDrawerContent>
 
                         <Grid ClipToBounds="True"

@@ -84,34 +84,38 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\ILink.cs" />
+    <Compile Include="Models\INavigationItem.cs" />
+    <Compile Include="Models\ITabItem.cs" />
+    <Compile Include="Models\Link.cs" />
     <Compile Include="Models\NavigationEventArgs.cs" />
+    <Compile Include="Models\NavigationItem.cs" />
     <Compile Include="Models\NavigationState.cs" />
     <Compile Include="Models\INavigation.cs" />
+    <Compile Include="Models\TabItem.cs" />
+    <Compile Include="ViewModels\HomeViewModel.cs" />
+    <Compile Include="ViewModels\HypothesisTestingViewModel.cs" />
     <Compile Include="ViewModels\INavigationViewModel.cs" />
     <Compile Include="ViewModels\IPageViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Models\Navigation.cs" />
-    <Compile Include="ViewModels\TestViewModel.cs" />
+    <Compile Include="ViewModels\StatsAnalysisMenegerViewModel.cs" />
     <Compile Include="ViewModels\ValidationViewModelBase.cs" />
     <Compile Include="Views\AnimatedIcon.xaml.cs">
       <DependentUpon>AnimatedIcon.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Home.xaml.cs">
+      <DependentUpon>Home.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\HypothesisTestingView.xaml.cs">
+      <DependentUpon>HypothesisTestingView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TestView.xaml.cs">
-      <DependentUpon>TestView.xaml</DependentUpon>
+    <Compile Include="Views\StatsAnalysis.xaml.cs">
+      <DependentUpon>StatsAnalysis.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TestView1.xaml.cs">
-      <DependentUpon>TestView1.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\TestView2.xaml.cs">
-      <DependentUpon>TestView2.xaml</DependentUpon>
-    </Compile>
-    <Page Include="Resources\icon_xaml.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Themes\DropDownTextBoxTheme.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -128,19 +132,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Home.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\HypothesisTestingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\TestView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\TestView1.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\TestView2.xaml">
+    <Page Include="Views\StatsAnalysis.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -175,9 +179,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Graphicloads-Flat-Finance-Statistics-market.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.6.1 %28x86 и x64%29</ProductName>
@@ -188,9 +189,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\math_stats_icon_ico.ico" />

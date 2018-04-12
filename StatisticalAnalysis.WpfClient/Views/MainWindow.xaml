@@ -3,19 +3,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient"
+        xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient.Views"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Math Stats"  
         Background="{DynamicResource MaterialDesignPaper}"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.Foreground="{DynamicResource MaterialDesignLightForeground}"
         TextElement.FontWeight="Regular"
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"
         Style="{StaticResource MainWindowStyle}"
         FontFamily="{DynamicResource MaterialDesignFont}"
         Width="800"
-        Height="600" 
+        Height="600"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -48,7 +48,7 @@
 
                     <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}"
                                   DockPanel.Dock="Left"
-                                  IsChecked="True"
+                                  IsChecked="False"
                                   Width="20"
                                   Height="20"
                                   x:Name="MenuToggleButton" 
@@ -79,8 +79,7 @@
                                FontSize="16"
                                Height="20">
 
-                    <Run x:Name="mainTitle"
-                         Text="{Binding Title, Mode=OneTime}"/>
+                    <Run x:Name="mainTitle"/>
 
                     </TextBlock>
 

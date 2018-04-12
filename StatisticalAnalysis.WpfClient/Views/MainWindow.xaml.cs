@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -20,9 +21,12 @@ namespace StatisticalAnalysis.WpfClient.Views
     /// </summary>
     public partial class MainWindow : Window, IView<MainViewModel>
     {
-        public ICommand MinimizeCommand { get; set; }
-        public ICommand MaximizeCommand { get; set; }
-        public ICommand CloseCommand { get; set; }
+        public ICommand MinimizeCommand { get; }
+        public ICommand MaximizeCommand { get; }
+        public ICommand CloseCommand { get; }
+
+        // Using a DependencyProperty as the backing store for IsBusy.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsBusyProperty = DependencyProperty.RegisterAttached("IsBusy", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
 
         public static bool GetIsBusy(DependencyObject obj)
         {
@@ -33,9 +37,6 @@ namespace StatisticalAnalysis.WpfClient.Views
         {
             obj.SetValue(IsBusyProperty, value);
         }
-
-        // Using a DependencyProperty as the backing store for IsBusy.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty IsBusyProperty = DependencyProperty.RegisterAttached("IsBusy", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
 
         private int _currentNavIndex;
 
@@ -90,29 +91,19 @@ namespace StatisticalAnalysis.WpfClient.Views
                     }, TaskScheduler.FromCurrentSynchronizationContext());  
                 }              
 
+                var navListBox = (ListBox)Template.FindName("navListBox", this);
+
+                if (navListBox != null)
+                {                   
+                    navListBox.SelectionChanged += NavListBox_SelectionChanged;
+                    navListBox.PreviewMouseLeftButtonUp += NavListBox_PreviewMouseLeftButtonUp;
+                    navListBox.SelectedIndex = 0;
+                }              
+
                 await Task.Delay(5000);
 
-                SetIsBusy(this, false);
-
-                await ViewModel.Navigation.GoToAsync(() => new TestView()
-                {
-                    DataContext = new TestViewModel()
-                });
-
-                var listBox = (ListBox)Template.FindName("DemoItemsListBox", this);
-
-                // maintTitle заголовок главной страницы
-                // необходимо знать ее Тип чтобы потом 
-                // вернутся на эту страницу с дочерней страницы
-                // Пример : МайнТайтл > Тайтл1 > Тайтл2 и тд
-                // Если мы находимся на дочерней странице Тайтл2, то 
-                // при нажатии на МайнТайтл должны перейти
-                // на главную страницу при этом Тайтл1 и Тайтл2
-                // удаляются из навиг. меню.
-                mainTitle.Tag = ViewModel.Navigation.Content.GetType();
-
                 ViewModel.Navigation.Navigated += (_obj, _e) =>
-                {
+                {                   
                     if (_e.NavigationState == NavigationState.GoForward)
                     {
                         var chevronRight = new PackIcon()
@@ -127,8 +118,8 @@ namespace StatisticalAnalysis.WpfClient.Views
                             BaselineAlignment = BaselineAlignment.Center
                         };
 
-                        var navDataContext = ViewModel.Navigation.Content.DataContext;
-                        var pageTitle = new Run((navDataContext as IPageViewModel).Title)
+                        var pageViewModel = (IPageViewModel)ViewModel.Navigation.Content.DataContext;
+                        var pageTitle = new Run(pageViewModel.Title)
                         {
                             Tag = ViewModel.Navigation.Content.GetType()
                         };
@@ -141,15 +132,50 @@ namespace StatisticalAnalysis.WpfClient.Views
                     }
                     else if (_e.NavigationState == NavigationState.GoBack)
                     {
-                        while (navTextBox.Inlines.Count - 1 > _currentNavIndex)
-                        {
-                            navTextBox.Inlines.Remove(navTextBox.Inlines.LastInline);
-                        }
+                        ClearNavTextBox(_currentNavIndex);
                     }
                 };
+
+                SetIsBusy(this, false);
             };
 
             Loaded += loaded;
+        }
+
+        private void NavListBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var dependencyObject = Mouse.Captured as DependencyObject;
+            while (dependencyObject != null)
+            {
+                if (dependencyObject is ScrollBar) return;
+                dependencyObject = VisualTreeHelper.GetParent(dependencyObject);
+            }
+
+            MenuToggleButton.IsChecked = false;
+        }
+
+        private async void NavListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {            
+            // Single
+            var item = e.AddedItems[0];
+
+            if (item is INavigationItem navItem)
+            {
+                // maintTitle заголовок главной страницы
+                // необходимо знать ее Тип чтобы потом 
+                // вернутся на эту страницу с дочерней страницы
+                // Пример : МайнТайтл > Тайтл1 > Тайтл2 и тд
+                // Если мы находимся на дочерней странице Тайтл2, то 
+                // при нажатии на МайнТайтл должны перейти
+                // на главную страницу при этом Тайтл1 и Тайтл2
+                // удаляются из навиг. меню.
+                mainTitle.Tag = navItem.ViewType;
+                mainTitle.Text = navItem.Title;
+
+                await ViewModel.Navigation.GoToAsync(navItem.ViewType);
+            }
+
+            ClearNavTextBox();
         }
 
         protected override void OnStateChanged(EventArgs e)
@@ -180,11 +206,6 @@ namespace StatisticalAnalysis.WpfClient.Views
             base.OnStateChanged(e);
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
-        {
-            await ViewModel.Navigation.GoToAsync(() => new TestView1() { DataContext = new TestViewModel() });
-        }
-
         private async void Run_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is Run run)
@@ -192,6 +213,14 @@ namespace StatisticalAnalysis.WpfClient.Views
                 _currentNavIndex = navTextBox.Inlines.ToList().IndexOf(run);
 
                 await ViewModel.Navigation.GoBackAsync(run.Tag as Type);
+            }
+        }
+
+        private void ClearNavTextBox(int before = 0)
+        {
+            while (navTextBox.Inlines.Count - 1 > before)
+            {
+                navTextBox.Inlines.Remove(navTextBox.Inlines.LastInline);
             }
         }
     }

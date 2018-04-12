@@ -66,10 +66,11 @@ namespace StatisticalAnalysis.WpfClient.Models
             contentResolvers = new Dictionary<Type, Func<UserControl>>();
         }
 
-        private void AddType(Type type, Func<UserControl> func)
+        public void Add<T>(Func<T> func) where T : UserControl
         {
-            if (type == null) throw new ArgumentNullException(nameof(type));
             if (func == null) throw new ArgumentNullException(nameof(func));
+
+            var type = typeof(T);
 
             if (!contentResolvers.ContainsKey(type))
                 contentResolvers.Add(type, func);
@@ -90,7 +91,7 @@ namespace StatisticalAnalysis.WpfClient.Models
         {
             var type = func.Method.ReturnType;
 
-            AddType(type, func);
+            Add(func);
             GoTo(type, NavigationState.GoForward);
         }
 
