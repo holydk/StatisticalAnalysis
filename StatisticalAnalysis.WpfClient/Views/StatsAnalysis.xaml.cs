@@ -6,15 +6,15 @@ namespace StatisticalAnalysis.WpfClient.Views
     /// <summary>
     /// Логика взаимодействия для StatsAnalysis.xaml
     /// </summary>
-    public partial class StatsAnalysis : UserControl, IView<StatsAnalysisMenegerViewModel>
+    public partial class StatsAnalysis : UserControl, IView<StatsAnalysisManagerViewModel>
     {
-        public StatsAnalysisMenegerViewModel ViewModel
+        public StatsAnalysisManagerViewModel ViewModel
         {
-            get => DataContext as StatsAnalysisMenegerViewModel;
+            get => DataContext as StatsAnalysisManagerViewModel;
             set => DataContext = value;
         }
 
-        public StatsAnalysis(StatsAnalysisMenegerViewModel viewModel)
+        public StatsAnalysis(StatsAnalysisManagerViewModel viewModel)
         {
             ViewModel = viewModel;
 

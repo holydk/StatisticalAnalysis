@@ -94,12 +94,17 @@
     <Compile Include="Models\INavigation.cs" />
     <Compile Include="Models\TabItem.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
-    <Compile Include="ViewModels\HypothesisTestingViewModel.cs" />
+    <Compile Include="ViewModels\HypothesisTestingManagerViewModel.cs" />
+    <Compile Include="ViewModels\IInformationPageViewModel.cs" />
     <Compile Include="ViewModels\INavigationViewModel.cs" />
     <Compile Include="ViewModels\IPageViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Models\Navigation.cs" />
-    <Compile Include="ViewModels\StatsAnalysisMenegerViewModel.cs" />
+    <Compile Include="ViewModels\NavigationPageViewModel.cs" />
+    <Compile Include="ViewModels\InformationPageViewModel.cs" />
+    <Compile Include="ViewModels\PageViewModel.cs" />
+    <Compile Include="ViewModels\StatsAnalysisManagerViewModel.cs" />
+    <Compile Include="ViewModels\TTypeDistributionViewModel.cs" />
     <Compile Include="ViewModels\ValidationViewModelBase.cs" />
     <Compile Include="Views\AnimatedIcon.xaml.cs">
       <DependentUpon>AnimatedIcon.xaml</DependentUpon>
@@ -115,6 +120,9 @@
     </Compile>
     <Compile Include="Views\StatsAnalysis.xaml.cs">
       <DependentUpon>StatsAnalysis.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TTypeDistributionView.xaml.cs">
+      <DependentUpon>TTypeDistributionView.xaml</DependentUpon>
     </Compile>
     <Page Include="Themes\DropDownTextBoxTheme.xaml">
       <SubType>Designer</SubType>
@@ -145,6 +153,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\StatsAnalysis.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TTypeDistributionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

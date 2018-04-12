@@ -1,7 +1,11 @@
 ﻿namespace StatisticalAnalysis.WpfClient.ViewModels
 {
-    public class HomeViewModel : IPageViewModel
+    public class HomeViewModel : PageViewModel
     {
-        public string Title => "Главная";
+        public HomeViewModel()
+            : base("Главная")
+        {
+
+        }
     }
 }

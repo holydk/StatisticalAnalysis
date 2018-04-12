@@ -6,34 +6,27 @@ using System.Windows.Input;
 
 namespace StatisticalAnalysis.WpfClient.ViewModels
 {
-    public class MainViewModel : INavigationViewModel
+    public class MainViewModel : NavigationPageViewModel
     {
-        private IPageViewModel[] PagesViewModels;
-
-        public INavigation Navigation { get; }
-
-        public INavigationItem[] NavigationItems { get; }
-
         public ILink[] Links { get; }
 
         public ICommand OpenLinkCommand { get; }
 
-        public MainViewModel()
+        public MainViewModel(INavigation navigation, string title)
+            : base(navigation, title)
         {
-            Navigation = new Navigation();
-
             var homeVm = new HomeViewModel();
             Navigation.Add(() => new Home(homeVm));
 
-            var statsAnalysisVm = new StatsAnalysisMenegerViewModel(Navigation);
+            var statsAnalysisVm = new StatsAnalysisManagerViewModel(Navigation);
             Navigation.Add(() => new StatsAnalysis(statsAnalysisVm));
 
-            PagesViewModels = new IPageViewModel[]
+            _pagesViewModels = new IPageViewModel[]
             {
                 homeVm, statsAnalysisVm
             };
 
-            NavigationItems = new INavigationItem[]
+            _navigationItems = new INavigationItem[]
             {
                 new NavigationItem(homeVm.Title, typeof(Home), PackIconKind.Home),
                 new NavigationItem(statsAnalysisVm.Title, typeof(StatsAnalysis), PackIconKind.ChartBar)

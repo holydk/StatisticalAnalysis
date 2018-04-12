@@ -12,7 +12,7 @@
                    VerticalAlignment="Center"
                    HorizontalAlignment="Center"/>
 
-        <Button Content="Go To Hypotesis Testing"
+        <Button Content="Go To Hypothesis Testing"
                 HorizontalAlignment="Center"
                 Margin="0 100 0 0"
                 Click="Button_Click"/>

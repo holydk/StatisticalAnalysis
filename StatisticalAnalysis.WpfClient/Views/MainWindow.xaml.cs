@@ -46,8 +46,10 @@ namespace StatisticalAnalysis.WpfClient.Views
             set => DataContext = value;
         }
 
-        public MainWindow()
+        public MainWindow(MainViewModel viewModel)
         {
+            ViewModel = viewModel;
+
             SetIsBusy(this, true);
 
             InitializeComponent();
@@ -55,8 +57,6 @@ namespace StatisticalAnalysis.WpfClient.Views
             MinimizeCommand = new RelayCommand((sender) => WindowState = WindowState.Minimized);
             MaximizeCommand = new RelayCommand((sender) => WindowState ^= WindowState.Maximized);
             CloseCommand = new RelayCommand((sender) => Close());
-
-            ViewModel = new MainViewModel();
 
             RoutedEventHandler loaded = null;
             loaded = async (obj, e) =>

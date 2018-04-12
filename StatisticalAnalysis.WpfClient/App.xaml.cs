@@ -1,4 +1,6 @@
-﻿using StatisticalAnalysis.WpfClient.Views;
+﻿using StatisticalAnalysis.WpfClient.Models;
+using StatisticalAnalysis.WpfClient.ViewModels;
+using StatisticalAnalysis.WpfClient.Views;
 using System.Windows;
 
 namespace StatisticalAnalysis.WpfClient
@@ -10,8 +12,10 @@ namespace StatisticalAnalysis.WpfClient
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            MainWindow = new MainWindow();
+            var navigation = new Navigation();
+            var mainViewModel = new MainViewModel(navigation, "Math Stats");
 
+            MainWindow = new MainWindow(mainViewModel);
             MainWindow.Show();
 
             base.OnStartup(e);
