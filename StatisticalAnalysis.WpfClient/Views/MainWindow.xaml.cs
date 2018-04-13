@@ -28,14 +28,23 @@ namespace StatisticalAnalysis.WpfClient.Views
         // Using a DependencyProperty as the backing store for IsBusy.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsBusyProperty = DependencyProperty.RegisterAttached("IsBusy", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
 
+        public static void SetIsBusy(DependencyObject obj, bool value)
+        {
+            obj.SetValue(IsBusyProperty, value);
+        }
+
         public static bool GetIsBusy(DependencyObject obj)
         {
             return (bool)obj.GetValue(IsBusyProperty);
         }
 
-        public static void SetIsBusy(DependencyObject obj, bool value)
+        // Using a DependencyProperty as the backing store for IsOpenInformationBox.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsOpenInformationBoxProperty = DependencyProperty.Register("IsOpenInformationBox", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+
+        public bool IsOpenInformationBox
         {
-            obj.SetValue(IsBusyProperty, value);
+            get { return (bool)GetValue(IsOpenInformationBoxProperty); }
+            set { SetValue(IsOpenInformationBoxProperty, value); }
         }
 
         private int _currentNavIndex;

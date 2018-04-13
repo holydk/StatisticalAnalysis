@@ -25,6 +25,38 @@
             <EventSetter Event="MouseDown" Handler="Run_MouseDown"/>
         </Style>
 
+        <Style x:Key="InfoBorderStyle" TargetType="{x:Type Border}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsOpenInformationBox, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" Value="true">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimationUsingKeyFrames Storyboard.TargetProperty="Margin">
+                                    <EasingThicknessKeyFrame Value="0" KeyTime="0:0:0.4">
+                                        <EasingThicknessKeyFrame.EasingFunction>
+                                            <SineEase EasingMode="EaseOut" />
+                                        </EasingThicknessKeyFrame.EasingFunction>
+                                    </EasingThicknessKeyFrame>
+                                </ThicknessAnimationUsingKeyFrames>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0.4">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
     </Window.Resources>
 
     <Grid>
@@ -32,62 +64,139 @@
             <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
 
-        <materialDesign:TransitioningContent Grid.Row="0">
+        <materialDesign:TransitioningContent Grid.Row="0"
+                                             Grid.ColumnSpan="2">
             <materialDesign:TransitioningContent.OpeningEffects>
                 <materialDesign:TransitionEffect Kind="SlideInFromTop"/>
                 <materialDesign:TransitionEffect Kind="FadeIn"/>
             </materialDesign:TransitioningContent.OpeningEffects>
 
-            <materialDesign:ColorZone Padding="24 0 24 0"
-                                      Height="48"
+            <materialDesign:ColorZone Height="48"
+                                      ClipToBounds="False"
                                       materialDesign:ShadowAssist.ShadowDepth="Depth2"
                                       Mode="PrimaryMid">
 
-                <DockPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
 
-                    <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}"
-                                  DockPanel.Dock="Left"
-                                  IsChecked="False"
-                                  Width="20"
-                                  Height="20"
-                                  x:Name="MenuToggleButton" 
-                                  HorizontalAlignment="Left"/>
+                    <DockPanel Grid.Column="0"
+                               Margin="24 0 24 0">
 
-                    <materialDesign:PackIcon
+                        <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}"
+                                      DockPanel.Dock="Left"
+                                      IsChecked="False"
+                                      Width="20"
+                                      Height="20"
+                                      x:Name="MenuToggleButton" 
+                                      HorizontalAlignment="Left"/>
+
+                        <ToggleButton x:Name="infoBtn"
+                                      DockPanel.Dock="Right"
+                                      IsChecked="{Binding IsOpenInformationBox, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                                      Style="{StaticResource MaterialDesignActionToggleButton}">
+                            <materialDesign:ToggleButtonAssist.OnContent>
+                                <materialDesign:PackIcon Kind="Information"/>
+                            </materialDesign:ToggleButtonAssist.OnContent>
+
+                            <materialDesign:PackIcon Kind="InformationOutline"                           
+                                                     Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                                     Width="20"
+                                                     Height="20"/>
+
+                        </ToggleButton>
+
+                        <materialDesign:PackIcon DockPanel.Dock="Right"
+                                                 Kind="Magnify"
+                                                 VerticalAlignment="Center"
+                                                 Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                                 Width="20"
+                                                 Height="20"
+                                                 Margin="0 0 12 0"/>
+
+                        <TextBlock x:Name="navTextBox"
+                                   DockPanel.Dock="Left"
+                                   VerticalAlignment="Center"                            
+                                   Margin="36 0 0 0"
+                                   TextTrimming="CharacterEllipsis"
+                                   FontSize="16"
+                                   Height="20">
+
+                            <Run x:Name="mainTitle"/>
+
+                        </TextBlock>
+
+                    </DockPanel>
+
+                    <Border x:Name="infoHeader"
+                            Grid.Column="1"
                             DockPanel.Dock="Right"
-                            Kind="InformationOutline"
-                            VerticalAlignment="Center"
-                            Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
-                            Width="20"
-                            Height="20"/>
+                            HorizontalAlignment="Left"
+                            Width="250"
+                            Margin="0 0 -250 0"
+                            Background="#FF069BDF"
+                            Padding="0 0 18 0"
+                            Style="{StaticResource InfoBorderStyle}">
 
-                    <materialDesign:PackIcon
-                            DockPanel.Dock="Right"
-                            Kind="Magnify"
-                            VerticalAlignment="Center"
-                            Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
-                            Width="20"
-                            Height="20"
-                            Margin="0 0 12 0"/>
+                        <DockPanel>
 
-                    <TextBlock x:Name="navTextBox"
-                               DockPanel.Dock="Left"
-                               VerticalAlignment="Center"                            
-                               Margin="36 0 0 0"
-                               TextTrimming="CharacterEllipsis"
-                               FontSize="16"
-                               Height="20">
+                            <materialDesign:PopupBox DockPanel.Dock="Right"
+                                                     HorizontalAlignment="Right"
+                                                     PlacementMode="BottomAndAlignRightEdges" 
+                                                     StaysOpen="False">
+                                <materialDesign:PopupBox.ToggleContent>
 
-                    <Run x:Name="mainTitle"/>
+                                    <materialDesign:PackIcon Kind="DotsVertical"
+                                                             Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                                             Width="20"
+                                                             Height="20"/>
 
-                    </TextBlock>
+                                </materialDesign:PopupBox.ToggleContent>
 
-                </DockPanel>
+                                <StackPanel>
+                                    <Button Content="Hello World"/>
+                                    <Button Content="Nice Popup"/>
+                                    <Button Content="Can't Touch This" IsEnabled="False" />
+                                    <Separator/>
+                                    <Button Content="Goodbye"/>
+                                </StackPanel>
+
+                            </materialDesign:PopupBox>
+
+                        </DockPanel>
+
+                    </Border>
+
+                </Grid>
 
             </materialDesign:ColorZone>
 
         </materialDesign:TransitioningContent>
+
+        <Border Grid.Row="1"
+                Grid.Column="1"
+                Width="{Binding Width, ElementName=infoHeader}"
+                Margin="{Binding Margin, ElementName=infoHeader}"
+                BorderThickness="1,0,0,0"
+                Panel.ZIndex="-1"
+                Background="#FFEBEBEB"
+                BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}">
+
+            <DockPanel Margin="24,24,0,0">
+
+                <TextBlock Text="THIS IS INFORMATION"
+                           DockPanel.Dock="Top"/>
+
+            </DockPanel>
+
+        </Border>
 
         <materialDesign:TransitioningContent Grid.Row="1"
                                              Panel.ZIndex="-1">
