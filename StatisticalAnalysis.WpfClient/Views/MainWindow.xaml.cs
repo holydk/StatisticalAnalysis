@@ -19,7 +19,7 @@ namespace StatisticalAnalysis.WpfClient.Views
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, IView<MainViewModel>
+    public partial class MainWindow : Window, IView<INavigationViewModel>
     {
         public ICommand MinimizeCommand { get; }
         public ICommand MaximizeCommand { get; }
@@ -49,13 +49,13 @@ namespace StatisticalAnalysis.WpfClient.Views
 
         private int _currentNavIndex;
 
-        public MainViewModel ViewModel
+        public INavigationViewModel ViewModel
         {
-            get => DataContext as MainViewModel;
+            get => DataContext as INavigationViewModel;
             set => DataContext = value;
         }
 
-        public MainWindow(MainViewModel viewModel)
+        public MainWindow(INavigationViewModel viewModel)
         {
             ViewModel = viewModel;
 
@@ -115,6 +115,12 @@ namespace StatisticalAnalysis.WpfClient.Views
                 {                   
                     if (_e.NavigationState == NavigationState.GoForward)
                     {
+                        var pageViewModel = (IPageViewModel)ViewModel.Navigation.Content.DataContext;
+
+                        if (pageViewModel == null ||
+                            pageViewModel.Title == mainTitle.Text)
+                            return;
+
                         var chevronRight = new PackIcon()
                         {
                             Kind = PackIconKind.ChevronRight,
@@ -128,7 +134,6 @@ namespace StatisticalAnalysis.WpfClient.Views
                             BaselineAlignment = BaselineAlignment.Center
                         };
 
-                        var pageViewModel = (IPageViewModel)ViewModel.Navigation.Content.DataContext;
                         var pageTitle = new Run(pageViewModel.Title)
                         {
                             Tag = ViewModel.Navigation.Content.GetType()
@@ -164,7 +169,7 @@ namespace StatisticalAnalysis.WpfClient.Views
             MenuToggleButton.IsChecked = false;
         }
 
-        private async void NavListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void NavListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {            
             // Single
             var item = e.AddedItems[0];
@@ -182,7 +187,8 @@ namespace StatisticalAnalysis.WpfClient.Views
                 mainTitle.Tag = navItem.ViewType;
                 mainTitle.Text = navItem.Title;
 
-                await ViewModel.Navigation.GoToAsync(navItem.ViewType);
+                ViewModel.GoToCommand.Execute(navItem);
+                //await ViewModel.Navigation.GoToAsync(navItem.ViewType);
             }
 
             ClearNavTextBox();

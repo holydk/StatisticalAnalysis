@@ -4,18 +4,57 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:models="clr-namespace:StatisticalAnalysis.WpfClient.Models"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="500">
-    <Grid>
 
-        <TextBlock Text="STATS ANALYSIS"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"/>
+    <ItemsControl ItemsSource="{Binding NavigationItems}"
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                  ScrollViewer.CanContentScroll="True"
+                  Padding="4 24 4 0">
+        <ItemsControl.ItemTemplate>
 
-        <Button Content="Go To Hypothesis Testing"
-                HorizontalAlignment="Center"
-                Margin="0 100 0 0"
-                Click="Button_Click"/>
+            <DataTemplate DataType="{x:Type models:ILink}">
 
-    </Grid>
+                <Button x:Name="Root"
+                        Height="40"
+                        Padding="20 0 12 0"
+                        HorizontalContentAlignment="Left"
+                        ToolTip="{Binding ToolTip}" 
+                        ToolTipService.InitialShowDelay="0" 
+                        Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                        Style="{DynamicResource MaterialDesignFlatButton}"
+                        Command="{Binding DataContext.GoToCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                        CommandParameter="{Binding}">
+
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+
+                        <materialDesign:PackIcon x:Name="PackIcon"
+                                                    Width="22"
+                                                    Height="22"
+                                                    Kind="{Binding IconKind}" />
+
+                        <TextBlock Margin="12 0 0 0"
+                                    VerticalAlignment="Center"
+                                    FontSize="14"
+                                    Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                    Text="{Binding Title, Mode=OneWay}" />
+
+                    </StackPanel>
+
+                </Button>
+
+            </DataTemplate>
+
+        </ItemsControl.ItemTemplate>
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <VirtualizingStackPanel Orientation="Vertical" />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+    </ItemsControl>
+
 </UserControl>

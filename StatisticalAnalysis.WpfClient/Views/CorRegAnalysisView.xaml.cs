@@ -4,17 +4,17 @@ using System.Windows.Controls;
 namespace StatisticalAnalysis.WpfClient.Views
 {
     /// <summary>
-    /// Логика взаимодействия для TTypeDistributionView.xaml
+    /// Логика взаимодействия для CorRegAnalysisView.xaml
     /// </summary>
-    public partial class TTypeDistributionView : UserControl, IView
+    public partial class CorRegAnalysisView : UserControl, IView
     {
         public IPageViewModel ViewModel
         {
             get => DataContext as IPageViewModel;
             set => DataContext = value;
         }
-    
-        public TTypeDistributionView(IPageViewModel viewModel)
+
+        public CorRegAnalysisView(IPageViewModel viewModel)
         {
             ViewModel = viewModel;
 

@@ -3,7 +3,7 @@
     public class TTypeDistributionViewModel : InformationPageViewModel
     {
         public TTypeDistributionViewModel()
-            : base("О виде распределения")
+            : base("О законе распределения")
         {
 
         }

@@ -1,6 +1,9 @@
-﻿using StatisticalAnalysis.WpfClient.Models;
+﻿using StatisticalAnalysis.WpfClient.Commands;
+using StatisticalAnalysis.WpfClient.Models;
 using System;
 using System.Collections.Generic;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace StatisticalAnalysis.WpfClient.ViewModels
 {
@@ -10,13 +13,39 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
 
         public INavigation Navigation { get; }
 
+        public UserControl Content => Navigation.Content;
+
         protected IEnumerable<INavigationItem> _navigationItems;
         public IEnumerable<INavigationItem> NavigationItems => _navigationItems;
+
+        public ICommand GoToCommand { get; }
+
+        public ICommand GoBackToCommand { get; }
 
         public NavigationPageViewModel(INavigation navigation, string title)
             : base(title)
         {
             Navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+
+            GoToCommand = new RelayCommand(async (sender) =>
+            {
+                if (sender is INavigationItem navItem)
+                {
+                    await Navigation.GoToAsync(navItem.ViewType);
+                }
+            });
+
+            GoBackToCommand = new RelayCommand(async (sender) =>
+            {
+                if (sender is INavigationItem navItem)
+                {
+                    await Navigation.GoBackAsync(navItem.ViewType);
+                }
+                else if (sender is Type viewType)
+                {
+                    await Navigation.GoBackAsync(viewType);
+                }
+            });
         }
     }
 }

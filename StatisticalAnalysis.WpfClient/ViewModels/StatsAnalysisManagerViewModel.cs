@@ -18,19 +18,31 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             var hypTestingVm = new HypothesisTestingManagerViewModel(navigation);
             Navigation.Add(() => new HypothesisTestingView(hypTestingVm));
 
+            var corRegAnalysisVm = new CorRegAnalysisViewModel();
+            Navigation.Add(() => new CorRegAnalysisView(corRegAnalysisVm));
+
+            var timeSerAnalysisVm = new TimeSeriesAnalysisViewModel();
+            Navigation.Add(() => new TimeSeriesAnalysisView(timeSerAnalysisVm));
+
+            var forecastingTimeSerVm = new ForecastingTimeSeriesViewModel();
+            Navigation.Add(() => new ForecastingTimeSeriesView(forecastingTimeSerVm));
+
             _pagesViewModels = new IPageViewModel[]
             {
-                hypTestingVm
+                hypTestingVm, corRegAnalysisVm, timeSerAnalysisVm
             };
 
             _navigationItems = new INavigationItem[]
             {
-                new NavigationItem(hypTestingVm.Title, typeof(HypothesisTestingView), MaterialDesignThemes.Wpf.PackIconKind.FormatListChecks)
+                new NavigationItem(hypTestingVm.Title, typeof(HypothesisTestingView), MaterialDesignThemes.Wpf.PackIconKind.FormatListChecks),
+                new NavigationItem(corRegAnalysisVm.Title, typeof(CorRegAnalysisView), MaterialDesignThemes.Wpf.PackIconKind.ChartArc),
+                new NavigationItem(timeSerAnalysisVm.Title, typeof(TimeSeriesAnalysisView), MaterialDesignThemes.Wpf.PackIconKind.ChartLine),
+                new NavigationItem(forecastingTimeSerVm.Title, typeof(ForecastingTimeSeriesView), MaterialDesignThemes.Wpf.PackIconKind.ChartTimeline)
             };
 
             _informationLinks = new ILink[]
             {
-                new Link("Википедия", "", MaterialDesignThemes.Wpf.PackIconKind.Wikipedia)
+                new Link("Википедия", "https://ru.wikipedia.org/wiki/%D0%A1%D1%82%D0%B0%D1%82%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B0", MaterialDesignThemes.Wpf.PackIconKind.Wikipedia)
             };
         }
     }
