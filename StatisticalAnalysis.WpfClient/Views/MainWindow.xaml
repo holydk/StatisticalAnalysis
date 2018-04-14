@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient.Views"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:controls="clr-namespace:StatisticalAnalysis.WpfClient.Controls"
         mc:Ignorable="d"
         Title="Math Stats"  
         Background="{DynamicResource MaterialDesignPaper}"
@@ -15,7 +16,7 @@
         Style="{StaticResource MainWindowStyle}"
         FontFamily="{DynamicResource MaterialDesignFont}"
         Width="800"
-        Height="600"
+        Height="600"        
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -25,6 +26,11 @@
             <EventSetter Event="MouseDown" Handler="Run_MouseDown"/>
         </Style>
 
+        <Style TargetType="{x:Type materialDesign:PackIcon}">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+        </Style>
+        
         <Style x:Key="InfoBorderStyle" TargetType="{x:Type Border}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsOpenInformationBox, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" Value="true">
@@ -113,13 +119,15 @@
 
                         </ToggleButton>
 
-                        <materialDesign:PackIcon DockPanel.Dock="Right"
-                                                 Kind="Magnify"
-                                                 VerticalAlignment="Center"
-                                                 Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
-                                                 Width="20"
-                                                 Height="20"
-                                                 Margin="0 0 12 0"/>
+                        <controls:SearchTextBox DockPanel.Dock="Right"
+                                                Width="150"
+                                                IsOpen="False"
+                                                materialDesign:HintAssist.Hint="Поиск"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalAlignment="Right"
+                                                BorderBrush="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                                CaretBrush="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                                Margin="0 0 12 0"/>
 
                         <TextBlock x:Name="navTextBox"
                                    DockPanel.Dock="Left"

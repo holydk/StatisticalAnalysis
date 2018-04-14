@@ -15,6 +15,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
                 <ResourceDictionary Source="Themes/Generic.xaml"/>
                 <ResourceDictionary Source="Themes/MainWindowTheme.xaml"/>
+                <ResourceDictionary Source="Themes/SearchTextBoxTheme.xaml"/>
 
             </ResourceDictionary.MergedDictionaries>
 

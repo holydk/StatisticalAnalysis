@@ -119,6 +119,7 @@ namespace StatisticalAnalysis.WpfClient.Views
                         {
                             Kind = PackIconKind.ChevronRight,
                             Width = 20,
+                            Height = 16,
                             Foreground = (SolidColorBrush)Application.Current.Resources["PrimaryHueMidForegroundBrush"]
                         };
 
