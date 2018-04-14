@@ -85,8 +85,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controls\SearchTextBox.cs" />
+    <Compile Include="Models\IInformationItem.cs" />
     <Compile Include="Models\ILink.cs" />
     <Compile Include="Models\INavigationItem.cs" />
+    <Compile Include="Models\InformationItem.cs" />
     <Compile Include="Models\ITabItem.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\NavigationEventArgs.cs" />
@@ -94,6 +96,7 @@
     <Compile Include="Models\NavigationState.cs" />
     <Compile Include="Models\INavigation.cs" />
     <Compile Include="Models\TabItem.cs" />
+    <Compile Include="Controls\IndexedItemsControl.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
     <Compile Include="ViewModels\HypothesisTestingManagerViewModel.cs" />
     <Compile Include="ViewModels\IInformationPageViewModel.cs" />

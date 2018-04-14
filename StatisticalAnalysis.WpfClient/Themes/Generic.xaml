@@ -3,7 +3,7 @@
                     xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient.Themes"
                     xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
-    <SolidColorBrush x:Key="SemiTransparentGreyBrush" Color="#40808080" options:Freeze="True" />
-    <SolidColorBrush x:Key="AccentColorBrush" Color="#CC119EDA" options:Freeze="True" />
+    <SolidColorBrush x:Key="InfoBoxBackground" Color="#FFEBEBEB" options:Freeze="True"/>
+    <SolidColorBrush x:Key="InfoBoxHeaderBackground" Color="#FF069BDF" options:Freeze="True"/>
 
 </ResourceDictionary>

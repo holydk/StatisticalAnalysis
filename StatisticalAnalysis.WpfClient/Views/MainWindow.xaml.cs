@@ -233,5 +233,17 @@ namespace StatisticalAnalysis.WpfClient.Views
                 navTextBox.Inlines.Remove(navTextBox.Inlines.LastInline);
             }
         }
+
+        private void Storyboard_Completed(object sender, EventArgs e)
+        {
+            if (IsOpenInformationBox)
+                scrollInfoBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;                          
+        }
+
+        private void infoBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (!IsOpenInformationBox)
+                scrollInfoBox.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+        }
     }
 }

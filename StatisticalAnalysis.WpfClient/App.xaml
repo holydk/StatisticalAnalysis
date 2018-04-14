@@ -6,7 +6,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                
+
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.LightBlue.xaml" />
@@ -18,15 +18,6 @@
                 <ResourceDictionary Source="Themes/SearchTextBoxTheme.xaml"/>
 
             </ResourceDictionary.MergedDictionaries>
-
-            <SolidColorBrush x:Key="SecondaryAccentBrush" Color="{StaticResource Accent400}" po:Freeze="True" />
-            <SolidColorBrush x:Key="SecondaryAccentForegroundBrush" Color="{StaticResource Accent400Foreground}" po:Freeze="True" />
-
-            <SolidColorBrush x:Key="AccentColorBrush" Color="{DynamicResource Primary500}"/>
-            <SolidColorBrush x:Key="AccentColorBrush2" Color="{DynamicResource Primary400}"/>
-            <SolidColorBrush x:Key="AccentColorBrush3" Color="{DynamicResource Primary300}"/>
-            <SolidColorBrush x:Key="AccentColorBrush4" Color="{DynamicResource Primary200}"/>
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>

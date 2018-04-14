@@ -1,4 +1,5 @@
 ﻿using StatisticalAnalysis.WpfClient.Models;
+using System.Collections.Generic;
 
 namespace StatisticalAnalysis.WpfClient.ViewModels
 {
@@ -6,6 +7,6 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
     {
         INavigation Navigation { get; }
 
-        INavigationItem[] NavigationItems { get; }
+        IEnumerable<INavigationItem> NavigationItems { get; }
     }
 }

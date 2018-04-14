@@ -1,5 +1,6 @@
 ﻿using StatisticalAnalysis.WpfClient.Models;
 using System;
+using System.Collections.Generic;
 
 namespace StatisticalAnalysis.WpfClient.ViewModels
 {
@@ -9,8 +10,8 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
 
         public INavigation Navigation { get; }
 
-        protected INavigationItem[] _navigationItems;
-        public INavigationItem[] NavigationItems => _navigationItems;
+        protected IEnumerable<INavigationItem> _navigationItems;
+        public IEnumerable<INavigationItem> NavigationItems => _navigationItems;
 
         public NavigationPageViewModel(INavigation navigation, string title)
             : base(title)

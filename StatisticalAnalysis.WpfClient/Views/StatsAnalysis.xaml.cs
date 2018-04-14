@@ -1,4 +1,5 @@
 ﻿using StatisticalAnalysis.WpfClient.ViewModels;
+using System.Linq;
 using System.Windows.Controls;
 
 namespace StatisticalAnalysis.WpfClient.Views
@@ -23,7 +24,7 @@ namespace StatisticalAnalysis.WpfClient.Views
 
         private async void Button_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            await ViewModel.Navigation.GoToAsync(ViewModel.NavigationItems[0].ViewType);
+            await ViewModel.Navigation.GoToAsync(ViewModel.NavigationItems.First().ViewType);
         }
     }
 }

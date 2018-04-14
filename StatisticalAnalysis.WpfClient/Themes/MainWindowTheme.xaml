@@ -152,6 +152,9 @@
                                                Style="{StaticResource MaterialDesignDarkSeparator}"/>
 
                                     <ItemsControl ItemsSource="{Binding Links}"
+                                                  VirtualizingStackPanel.IsVirtualizing="True"
+                                                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                                  ScrollViewer.CanContentScroll="True"
                                                   DockPanel.Dock="Top">
                                         <ItemsControl.ItemTemplate>
 
@@ -191,7 +194,7 @@
                                         </ItemsControl.ItemTemplate>
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Vertical" />
+                                                <VirtualizingStackPanel Orientation="Vertical" />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
                                     </ItemsControl>
