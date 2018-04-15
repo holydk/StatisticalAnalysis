@@ -8,5 +8,10 @@
         {
             Title = title;
         }
+
+        public virtual void Search(object sender)
+        {
+            
+        }
     }
 }

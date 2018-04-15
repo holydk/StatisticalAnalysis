@@ -124,6 +124,8 @@
 
                         <controls:SearchTextBox DockPanel.Dock="Right"
                                                 Width="150"
+                                                Search="SearchTextBox_Search"
+                                                KeyDown="SearchTextBox_KeyDown"
                                                 materialDesign:HintAssist.Hint="Поиск"
                                                 VerticalContentAlignment="Center"
                                                 HorizontalAlignment="Right"

@@ -250,5 +250,21 @@ namespace StatisticalAnalysis.WpfClient.Views
             if (!IsOpenInformationBox)
                 scrollInfoBox.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
         }
+
+        private void SearchTextBox_Search(string text)
+        {
+            
+        }
+
+        private void SearchTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            var content = ViewModel.Navigation.Content;
+
+            if (content != null && content.DataContext is IPageViewModel pageVm)
+            {
+                if (e.Key == Key.Enter)
+                    pageVm.Search((sender as TextBox).Text);
+            }
+        }
     }
 }

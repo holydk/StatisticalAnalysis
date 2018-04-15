@@ -3,5 +3,7 @@
     public interface IPageViewModel
     {
         string Title { get; }
+
+        void Search(object sender);
     }
 }

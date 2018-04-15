@@ -118,10 +118,9 @@ namespace StatisticalAnalysis.WpfClient.Controls
             if (IsOpen)
                 OnSearch();
             else
-            {
                 IsOpen = true;
-                Focus();
-            }        
+
+            Focus();
         }
 
         protected virtual void OnSearch() => Search?.Invoke(Text);
