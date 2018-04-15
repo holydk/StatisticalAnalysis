@@ -27,21 +27,21 @@
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
                         Style="{DynamicResource MaterialDesignFlatButton}"
                         Command="{Binding DataContext.GoToCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
-                        CommandParameter="{Binding}">
+                        CommandParameter="{Binding ViewType}">
 
                     <StackPanel Orientation="Horizontal"
                                 VerticalAlignment="Center">
 
                         <materialDesign:PackIcon x:Name="PackIcon"
-                                                    Width="22"
-                                                    Height="22"
-                                                    Kind="{Binding IconKind}" />
+                                                 Width="22"
+                                                 Height="22"
+                                                 Kind="{Binding IconKind}" />
 
                         <TextBlock Margin="12 0 0 0"
-                                    VerticalAlignment="Center"
-                                    FontSize="14"
-                                    Style="{StaticResource MaterialDesignSubheadingTextBlock}"
-                                    Text="{Binding Title, Mode=OneWay}" />
+                                   VerticalAlignment="Center"
+                                   FontSize="14"
+                                   Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                   Text="{Binding Title, Mode=OneWay}" />
 
                     </StackPanel>
 

@@ -29,19 +29,15 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
 
             GoToCommand = new RelayCommand(async (sender) =>
             {
-                if (sender is INavigationItem navItem)
+                if (sender is Type viewType)
                 {
-                    await Navigation.GoToAsync(navItem.ViewType);
+                    await Navigation.GoToAsync(viewType);
                 }
             });
 
             GoBackToCommand = new RelayCommand(async (sender) =>
             {
-                if (sender is INavigationItem navItem)
-                {
-                    await Navigation.GoBackAsync(navItem.ViewType);
-                }
-                else if (sender is Type viewType)
+                if (sender is Type viewType)
                 {
                     await Navigation.GoBackAsync(viewType);
                 }

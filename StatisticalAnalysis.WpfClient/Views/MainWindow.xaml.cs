@@ -187,8 +187,7 @@ namespace StatisticalAnalysis.WpfClient.Views
                 mainTitle.Tag = navItem.ViewType;
                 mainTitle.Text = navItem.Title;
 
-                ViewModel.GoToCommand.Execute(navItem);
-                //await ViewModel.Navigation.GoToAsync(navItem.ViewType);
+                ViewModel.GoToCommand.Execute(navItem.ViewType);
             }
 
             ClearNavTextBox();
@@ -222,13 +221,13 @@ namespace StatisticalAnalysis.WpfClient.Views
             base.OnStateChanged(e);
         }
 
-        private async void Run_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Run_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is Run run)
             {
                 _currentNavIndex = navTextBox.Inlines.ToList().IndexOf(run);
 
-                await ViewModel.Navigation.GoBackAsync(run.Tag as Type);
+                ViewModel.GoBackToCommand.Execute(run.Tag);
             }
         }
 
