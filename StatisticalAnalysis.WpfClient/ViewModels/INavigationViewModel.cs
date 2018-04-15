@@ -14,7 +14,5 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
         ICommand GoToCommand { get; }
 
         ICommand GoBackToCommand { get; }
-
-        UserControl Content { get; }
     }
 }

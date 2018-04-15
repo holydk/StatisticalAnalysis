@@ -104,12 +104,18 @@ namespace StatisticalAnalysis.WpfClient.Controls
 
             if (e.Key == Key.Enter)
                 OnSearch();
+            else if (e.Key == Key.Escape)
+                Close();
         }
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
-            IsOpen = false;
+            Close();
+        }
 
+        private void Close()
+        {
+            IsOpen = false;
             Keyboard.ClearFocus();
         }
 

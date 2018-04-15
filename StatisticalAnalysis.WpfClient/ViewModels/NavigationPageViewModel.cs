@@ -3,7 +3,6 @@ using StatisticalAnalysis.WpfClient.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -17,8 +16,6 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
         protected IPageViewModel[] _pagesViewModels;
 
         public INavigation Navigation { get; }
-
-        public UserControl Content => Navigation.Content;
 
         protected IEnumerable<INavigationItem> _navigationItems;
         public IEnumerable<INavigationItem> NavigationItems => _navigationItems;
