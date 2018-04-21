@@ -2,7 +2,7 @@
 
 namespace StatisticalAnalysis.WpfClient.Models
 {
-    public class InformationItem : TabItem, IInformationItem
+    public class InformationItem : ImageItem, IInformationItem
     {
         public string Description { get; }
 

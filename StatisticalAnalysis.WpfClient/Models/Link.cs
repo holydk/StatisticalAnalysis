@@ -2,7 +2,7 @@
 
 namespace StatisticalAnalysis.WpfClient.Models
 {
-    public class Link : TabItem, ILink
+    public class Link : ImageItem, ILink
     {
         public string Adress { get; }
 

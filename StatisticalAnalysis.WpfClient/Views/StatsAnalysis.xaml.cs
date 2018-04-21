@@ -1,5 +1,4 @@
 ﻿using StatisticalAnalysis.WpfClient.ViewModels;
-using System.Linq;
 using System.Windows.Controls;
 
 namespace StatisticalAnalysis.WpfClient.Views
@@ -7,24 +6,19 @@ namespace StatisticalAnalysis.WpfClient.Views
     /// <summary>
     /// Логика взаимодействия для StatsAnalysis.xaml
     /// </summary>
-    public partial class StatsAnalysis : UserControl, IView<StatsAnalysisManagerViewModel>
+    public partial class StatsAnalysis : UserControl, IView<INavigationViewModel>
     {
-        public StatsAnalysisManagerViewModel ViewModel
+        public INavigationViewModel ViewModel
         {
-            get => DataContext as StatsAnalysisManagerViewModel;
+            get => DataContext as INavigationViewModel;
             set => DataContext = value;
         }
 
-        public StatsAnalysis(StatsAnalysisManagerViewModel viewModel)
+        public StatsAnalysis(INavigationViewModel viewModel)
         {
             ViewModel = viewModel;
 
             InitializeComponent();
-        }
-
-        private async void Button_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            await ViewModel.Navigation.GoToAsync(ViewModel.NavigationItems.First().ViewType);
         }
     }
 }

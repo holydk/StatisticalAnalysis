@@ -149,7 +149,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected void OnPropertyChanged<T>(Expression<Func<T>> path)
+        protected virtual void OnPropertyChanged<T>(Expression<Func<T>> path)
         {
             InternalPropertyUpdate(GetPropertyName(path));
         }

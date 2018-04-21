@@ -3,7 +3,6 @@ using StatisticalAnalysis.WpfClient.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 

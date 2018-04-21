@@ -88,7 +88,6 @@
             </materialDesign:TransitioningContent.OpeningEffects>
 
             <materialDesign:ColorZone Height="48"
-                                      ClipToBounds="False"
                                       materialDesign:ShadowAssist.ShadowDepth="Depth2"
                                       Mode="PrimaryMid">
 
@@ -105,8 +104,7 @@
                                       DockPanel.Dock="Left"
                                       Width="20"
                                       Height="20"
-                                      x:Name="MenuToggleButton" 
-                                      HorizontalAlignment="Left"/>
+                                      x:Name="MenuToggleButton"/>
 
                         <ToggleButton x:Name="infoBtn"
                                       Click="infoBtn_Click"
@@ -125,10 +123,8 @@
                         <controls:SearchTextBox DockPanel.Dock="Right"
                                                 Width="150"
                                                 Search="SearchTextBox_Search"
-                                                KeyDown="SearchTextBox_KeyDown"
                                                 materialDesign:HintAssist.Hint="Поиск"
                                                 VerticalContentAlignment="Center"
-                                                HorizontalAlignment="Right"
                                                 BorderBrush="{DynamicResource PrimaryHueMidForegroundBrush}"
                                                 CaretBrush="{DynamicResource PrimaryHueMidForegroundBrush}"
                                                 Margin="0 0 12 0"/>
@@ -149,73 +145,69 @@
                     <Border x:Name="infoHeader"
                             Grid.Column="1"
                             DockPanel.Dock="Right"
-                            HorizontalAlignment="Left"
                             Width="250"
                             Margin="0 0 -250 0"
                             Background="{DynamicResource InfoBoxHeaderBackground}"
                             Padding="0 0 18 0"
                             Style="{StaticResource InfoBorderStyle}">
 
-                        <DockPanel>
 
-                            <materialDesign:PopupBox DockPanel.Dock="Right"
-                                                     HorizontalAlignment="Right"
-                                                     PlacementMode="BottomAndAlignRightEdges" 
-                                                     StaysOpen="False">
-                                <materialDesign:PopupBox.ToggleContent>
 
-                                    <materialDesign:PackIcon Kind="DotsVertical"
-                                                             Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"/>
+                        <materialDesign:PopupBox DockPanel.Dock="Right"
+                                                 HorizontalAlignment="Right"
+                                                 PlacementMode="BottomAndAlignRightEdges" 
+                                                 StaysOpen="False">
+                            <materialDesign:PopupBox.ToggleContent>
 
-                                </materialDesign:PopupBox.ToggleContent>
+                                <materialDesign:PackIcon Kind="DotsVertical"
+                                                         Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"/>
 
-                                <ItemsControl ItemsSource="{Binding Navigation.Content.DataContext.InformationLinks}"
-                                              VirtualizingStackPanel.IsVirtualizing="True"
-                                              VirtualizingStackPanel.VirtualizationMode="Recycling"
-                                              ScrollViewer.CanContentScroll="True"
-                                              DockPanel.Dock="Top">
-                                    <ItemsControl.ItemTemplate>
+                            </materialDesign:PopupBox.ToggleContent>
 
-                                        <DataTemplate DataType="{x:Type models:ILink}">
+                            <ItemsControl ItemsSource="{Binding Navigation.Content.DataContext.InformationLinks}"
+                                          VirtualizingStackPanel.IsVirtualizing="True"
+                                          VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                          ScrollViewer.CanContentScroll="True">
+                                <ItemsControl.ItemTemplate>
 
-                                            <Button Height="40"
-                                                    Padding="12 0 12 0"
-                                                    HorizontalContentAlignment="Left"
-                                                    ToolTip="{Binding ToolTip}" 
-                                                    ToolTipService.InitialShowDelay="0" 
-                                                    Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
-                                                    Style="{DynamicResource MaterialDesignFlatButton}"
-                                                    Command="{Binding DataContext.OpenLinkCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
-                                                    CommandParameter="{Binding}">
+                                    <DataTemplate DataType="{x:Type models:ILink}">
 
-                                                <StackPanel Orientation="Horizontal"
-                                                                VerticalAlignment="Center">
+                                        <Button Height="40"
+                                                Padding="12 0 12 0"
+                                                HorizontalContentAlignment="Left"
+                                                ToolTip="{Binding ToolTip}" 
+                                                ToolTipService.InitialShowDelay="0" 
+                                                Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                                                Style="{DynamicResource MaterialDesignFlatButton}"
+                                                Command="{Binding DataContext.OpenLinkCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                                                CommandParameter="{Binding}">
 
-                                                    <materialDesign:PackIcon Kind="{Binding IconKind}" />
+                                            <StackPanel Orientation="Horizontal"
+                                                        VerticalAlignment="Center">
 
-                                                    <TextBlock Margin="12 0 0 0"
-                                                               VerticalAlignment="Center"
-                                                               FontSize="14"
-                                                               Style="{StaticResource MaterialDesignSubheadingTextBlock}"
-                                                               Text="{Binding Title, Mode=OneWay}" />
+                                                <materialDesign:PackIcon Kind="{Binding IconKind}" />
 
-                                                </StackPanel>
+                                                <TextBlock Margin="12 0 0 0"
+                                                           VerticalAlignment="Center"
+                                                           FontSize="14"
+                                                           Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                                           Text="{Binding Title, Mode=OneWay}" />
 
-                                            </Button>
+                                            </StackPanel>
 
-                                        </DataTemplate>
+                                        </Button>
 
-                                    </ItemsControl.ItemTemplate>
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <VirtualizingStackPanel Orientation="Vertical" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
+                                    </DataTemplate>
 
-                            </materialDesign:PopupBox>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel Orientation="Vertical" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
 
-                        </DockPanel>
+                        </materialDesign:PopupBox>
 
                     </Border>
 
@@ -297,7 +289,7 @@
         <materialDesign:TransitioningContent Grid.Row="1"
                                              Panel.ZIndex="-1">
             <materialDesign:TransitioningContent.OpeningEffects>
-                <materialDesign:TransitionEffect Kind="ExpandIn"/>
+                <materialDesign:TransitionEffect Kind="SlideInFromBottom"/>
                 <materialDesign:TransitionEffect Kind="FadeIn"/>
             </materialDesign:TransitioningContent.OpeningEffects>
 

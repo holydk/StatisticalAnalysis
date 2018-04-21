@@ -67,6 +67,7 @@
 
                     <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
                         <materialDesign:DrawerHost.LeftDrawerContent>
+                            
                             <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}" 
                                     BorderThickness="0,0,1,0"
                                     WindowChrome.IsHitTestVisibleInChrome="True">

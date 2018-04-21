@@ -1,6 +1,6 @@
 ﻿namespace StatisticalAnalysis.WpfClient.Models
 {
-    public interface ILink : ITabItem
+    public interface ILink : IImageItem
     {
         string Adress { get; }
 

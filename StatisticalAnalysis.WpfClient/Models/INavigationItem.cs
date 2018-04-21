@@ -2,7 +2,7 @@
 
 namespace StatisticalAnalysis.WpfClient.Models
 {
-    public interface INavigationItem : ITabItem
+    public interface INavigationItem : IImageItem
     {
         Type ViewType { get; }
     }

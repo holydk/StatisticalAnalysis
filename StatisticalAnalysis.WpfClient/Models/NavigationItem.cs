@@ -3,7 +3,7 @@ using System;
 
 namespace StatisticalAnalysis.WpfClient.Models
 {
-    public class NavigationItem : TabItem, INavigationItem
+    public class NavigationItem : ImageItem, INavigationItem
     {
         public Type ViewType { get; }
 

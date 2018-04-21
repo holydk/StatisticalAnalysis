@@ -59,6 +59,7 @@
       <HintPath>..\packages\MaterialDesignThemes.2.4.0.1044\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xaml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="WindowsBase" />
@@ -75,8 +76,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controls\SearchTextBox.cs" />
+    <Compile Include="Helpers\DescriptionProvider.cs" />
+    <Compile Include="Helpers\EnumDescriptionConverter.cs" />
+    <Compile Include="Helpers\IntervalStringConverter.cs" />
+    <Compile Include="Models\DistributionSeriesInputType.cs" />
+    <Compile Include="Models\IImageItem.cs" />
     <Compile Include="Models\IInformationItem.cs" />
     <Compile Include="Models\ILink.cs" />
+    <Compile Include="Models\ImageItem.cs" />
     <Compile Include="Models\INavigationItem.cs" />
     <Compile Include="Models\InformationItem.cs" />
     <Compile Include="Models\ITabItem.cs" />
@@ -103,6 +110,12 @@
     <Compile Include="ViewModels\TimeSeriesAnalysisViewModel.cs" />
     <Compile Include="ViewModels\TTypeDistributionViewModel.cs" />
     <Compile Include="ViewModels\ValidationViewModelBase.cs" />
+    <Compile Include="ViewModels\Variation\DiscreteData.cs" />
+    <Compile Include="ViewModels\Variation\DiscreteGroupedData.cs" />
+    <Compile Include="ViewModels\Variation\IConvertToVariationPairs.cs" />
+    <Compile Include="ViewModels\Variation\SeriesDatum.cs" />
+    <Compile Include="ViewModels\Variation\СontinuousData.cs" />
+    <Compile Include="ViewModels\Variation\СontinuousGroupedData.cs" />
     <Compile Include="Views\AnimatedIcon.xaml.cs">
       <DependentUpon>AnimatedIcon.xaml</DependentUpon>
     </Compile>
@@ -223,5 +236,12 @@
   <ItemGroup>
     <Resource Include="Resources\math_stats_icon_ico.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\StatisticalAnalysis\StatisticalAnalysis.csproj">
+      <Project>{5de0ca38-3a4d-412d-a6f4-dc661f04a0e0}</Project>
+      <Name>StatisticalAnalysis</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

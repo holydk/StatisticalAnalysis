@@ -1,6 +1,5 @@
 ﻿using StatisticalAnalysis.WpfClient.Models;
 using System.Collections.Generic;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace StatisticalAnalysis.WpfClient.ViewModels

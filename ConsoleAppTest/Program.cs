@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ConsoleAppTest
@@ -25,6 +26,24 @@ namespace ConsoleAppTest
 
             Console.WriteLine(g1);
             Console.WriteLine(g2);
+            
+            var normal = new Normal(1012.5, 24.8069);
+            //normal.Samples(new double[]
+            //{
+            //    -1.02,
+            //    0.98,
+            //    1.58,
+            //    0.93,
+            //    0.2,
+            //    0.29,
+            //    0.79,
+            //    0.12,
+            //    1.04,
+            //    1.3
+            //});
+
+            var nCdf = Normal.CDF(1012.5, 24.8069, 1050) - Normal.CDF(1012.5, 24.8069, 1025);
+
 
             var st1 = new StudentT(0, 1, 20);
             st1.Samples(
@@ -51,6 +70,19 @@ namespace ConsoleAppTest
                     265,
                     275
                 });
+
+            Regex _regexBack = new Regex(@"(?:(?<Lower>[\d]+)? *-? *(?:(?<Upper>[\d]+)))");
+            var test0 = "66";
+
+            var select = test0;
+
+            if (_regexBack.IsMatch(select))
+            {
+                foreach (var match in _regexBack.Matches(select))
+                {
+
+                }
+            }
 
             Console.WriteLine(StatisticalAnalysisProvider.GetNumberOfIntervals(70));
 
