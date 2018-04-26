@@ -20,19 +20,11 @@ namespace StatisticalAnalysis.WpfClient.Views
 
             InitializeComponent();
 
-            if (viewModel is ViewModelBase viewModelBase)
+            if (viewModel is TTypeDistributionViewModel distrVM)
             {
-                viewModelBase.PropertyChanged -= ViewModelBase_PropertyChanged;
-                viewModelBase.PropertyChanged += ViewModelBase_PropertyChanged;
-            }
-        }
-
-        private void ViewModelBase_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "VariationData")
-            {
-                PART_InputDataContainer.Visibility = System.Windows.Visibility.Collapsed;
-                PART_InputDataContainer.Visibility = System.Windows.Visibility.Visible;
+                distrVM.VariationData = null;
+                distrVM.SelectedDistributionType = null;
+                distrVM.SelectedDistributionSeriesInputType = null;
             }
         }
     }

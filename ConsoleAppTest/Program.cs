@@ -2,6 +2,7 @@
 using StatisticalAnalysis.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -43,7 +44,6 @@ namespace ConsoleAppTest
             //});
 
             var nCdf = Normal.CDF(1012.5, 24.8069, 1050) - Normal.CDF(1012.5, 24.8069, 1025);
-
 
             var st1 = new StudentT(0, 1, 20);
             st1.Samples(

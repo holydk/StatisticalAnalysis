@@ -6,8 +6,9 @@
              xmlns:controls="clr-namespace:StatisticalAnalysis.WpfClient.Controls"
              xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient.Views"
              xmlns:helpers="clr-namespace:StatisticalAnalysis.WpfClient.Helpers"
-             xmlns:models="clr-namespace:StatisticalAnalysis.HypothesisTesting.Models;assembly=StatisticalAnalysis"
+             xmlns:models="clr-namespace:StatisticalAnalysis.WpfClient.Models"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mdconverters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
              xmlns:variation="clr-namespace:StatisticalAnalysis.WpfClient.ViewModels.Variation"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
@@ -15,6 +16,7 @@
 
         <helpers:EnumDescriptionConverter x:Key="enumToDescriptionConverter"/>
         <helpers:IntervalStringConverter x:Key="intervalStringConverter"/>
+        <mdconverters:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" NullValue="Hidden" NotNullValue="Visible"/>
 
         <Style x:Key="dataGridTextBlock" TargetType="{x:Type TextBlock}">
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -31,113 +33,169 @@
         </Style>
 
         <Style x:Key="inputDataGrid" TargetType="{x:Type DataGrid}" BasedOn="{StaticResource MaterialDesignDataGrid}">
-            <Setter Property="ItemsSource" Value="{Binding}"/>
+            <Setter Property="ItemsSource" Value="{Binding Data}"/>
             <Setter Property="CanUserAddRows" Value="True"/>
             <Setter Property="CanUserSortColumns" Value="False"/>
+            <Setter Property="CanUserResizeColumns" Value="False"/>
+            <Setter Property="CanUserResizeRows" Value="False"/>
             <Setter Property="AutoGenerateColumns" Value="False"/>
-            <Setter Property="ColumnWidth" Value="100"/>
-            <Setter Property="MinColumnWidth" Value="80"/>
-            <Setter Property="MaxColumnWidth" Value="180"/>
+            <Setter Property="ColumnWidth" Value="*"/>
+            <Setter Property="Width" Value="200"/>
             <Setter Property="materialDesign:DataGridAssist.CellPadding" Value="13 8 8 8"/>
             <Setter Property="materialDesign:DataGridAssist.ColumnHeaderPadding" Value="4"/>
         </Style>
 
+        <Style x:Key="seriesTypeComboBoxStyle" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource MaterialDesignFloatingHintComboBox}">
+            <Setter Property="Margin" Value="12 0 12 0"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.SelectedDistributionSeriesInputType, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Value="{x:Null}">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0"
+                                                    To="12 0 -212 0">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0.4">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="leftInputBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="Margin" Value="0 0 0 0"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.VariationData, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Value="{x:Null}">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0"
+                                                    To="-200 0 0 0">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0.4">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
         <DataTemplate DataType="{x:Type variation:DiscreteData}">
-            <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
-                    BorderThickness="0 0 1 0">
 
-                <DataGrid Style="{StaticResource inputDataGrid}">
-                    <DataGrid.Columns>
+            <DataGrid Style="{StaticResource inputDataGrid}">
+                <DataGrid.Columns>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
-                                                                   Header="X"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
-                                                                   HeaderStyle="{StaticResource dataGridColumnHeader}"/>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
+                                                               Header="X"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                                                               HeaderStyle="{StaticResource dataGridColumnHeader}"/>
 
-                    </DataGrid.Columns>
-                </DataGrid>
+                </DataGrid.Columns>
+            </DataGrid>
 
-            </Border>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type variation:DiscreteGroupedData}">
-            <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
-                    BorderThickness="0 0 1 0">
 
-                <DataGrid Style="{StaticResource inputDataGrid}">
-                    <DataGrid.Columns>
+            <DataGrid Style="{StaticResource inputDataGrid}">
+                <DataGrid.Columns>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Variant}"
-                                                                   Header="X"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
-                                                                   HeaderStyle="{StaticResource dataGridColumnHeader}"/>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Variant}"
+                                                               Header="X"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                                                               HeaderStyle="{StaticResource dataGridColumnHeader}"/>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
-                                                                   Header="F"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
-                                                                   HeaderStyle="{StaticResource dataGridColumnHeader}"/>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
+                                                               Header="F"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                                                               HeaderStyle="{StaticResource dataGridColumnHeader}"/>
 
-                    </DataGrid.Columns>
-                </DataGrid>
+                </DataGrid.Columns>
+            </DataGrid>
 
-            </Border>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type variation:СontinuousData}">
-            <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
-                    BorderThickness="0 0 1 0">
 
-                <DataGrid Style="{StaticResource inputDataGrid}">
-                    <DataGrid.Columns>
+            <DataGrid Style="{StaticResource inputDataGrid}">
+                <DataGrid.Columns>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
-                                                                   Header="X"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
-                                                                   HeaderStyle="{StaticResource dataGridColumnHeader}"/>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
+                                                               Header="X"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                                                               HeaderStyle="{StaticResource dataGridColumnHeader}"/>
 
-                    </DataGrid.Columns>
-                </DataGrid>
+                </DataGrid.Columns>
+            </DataGrid>
 
-            </Border>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type variation:СontinuousGroupedData}">
-            <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
-                    BorderThickness="0 0 1 0">
 
-                <DataGrid Style="{StaticResource inputDataGrid}">
-                    <DataGrid.Columns>
+            <DataGrid Style="{StaticResource inputDataGrid}">
+                <DataGrid.Columns>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Variant, Converter={StaticResource intervalStringConverter}, NotifyOnValidationError=True, ValidatesOnDataErrors=True}"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}">
-                            <DataGridTextColumn.HeaderStyle>
-                                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource dataGridColumnHeader}">
-                                    <Setter Property="Content">
-                                        <Setter.Value>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Variant, Converter={StaticResource intervalStringConverter}, NotifyOnValidationError=True, ValidatesOnDataErrors=True}"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource dataGridColumnHeader}">
+                                <Setter Property="Content">
+                                    <Setter.Value>
 
-                                            <TextBlock Cursor="Arrow" VerticalAlignment="Center">X<Run Text="i" BaselineAlignment="Subscript"/> - X<Run Text="i + 1" BaselineAlignment="Subscript"/></TextBlock>
+                                        <TextBlock Cursor="Arrow" VerticalAlignment="Center">X<Run Text="i" BaselineAlignment="Subscript"/> - X<Run Text="i + 1" BaselineAlignment="Subscript"/></TextBlock>
 
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </DataGridTextColumn.HeaderStyle>
-                        </materialDesign:MaterialDataGridTextColumn>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                    </materialDesign:MaterialDataGridTextColumn>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
-                                                                   Header="F"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
-                                                                   HeaderStyle="{StaticResource dataGridColumnHeader}"/>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
+                                                               Header="F"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                                                               HeaderStyle="{StaticResource dataGridColumnHeader}"/>
 
-                    </DataGrid.Columns>
-                </DataGrid>
+                </DataGrid.Columns>
+            </DataGrid>
 
-            </Border>
         </DataTemplate>
 
     </UserControl.Resources>
@@ -148,61 +206,158 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <materialDesign:TransitioningContent x:Name="PART_InputDataContainer"
-                                             Grid.Row="0">
-            <materialDesign:TransitioningContent.OpeningEffects>
-                <materialDesign:TransitionEffect Kind="SlideInFromLeft"/>
-                <materialDesign:TransitionEffect Kind="FadeIn"/>
-            </materialDesign:TransitioningContent.OpeningEffects>
-            <materialDesign:TransitioningContent.Resources>
-                
-            </materialDesign:TransitioningContent.Resources>
+        <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
+                BorderThickness="0 0 1 0"
+                Style="{StaticResource leftInputBorderStyle}">
 
-            <ContentControl Content="{Binding VariationData}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
 
-        </materialDesign:TransitioningContent>
+                <materialDesign:PopupBox Grid.Row="0"
+                                         Margin="12 12 12 0"
+                                         Panel.ZIndex="1"
+                                         HorizontalAlignment="Right"
+                                         PlacementMode="BottomAndAlignLeftEdges" 
+                                         StaysOpen="False">
+                    <materialDesign:PopupBox.ToggleContent>
+
+                        <materialDesign:PackIcon Kind="DotsHorizontal"
+                                                 Opacity="0.5"/>
+
+                    </materialDesign:PopupBox.ToggleContent>
+
+                    <ItemsControl ItemsSource="{Binding CommandItems}"
+                                  VirtualizingStackPanel.IsVirtualizing="True"
+                                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                  ScrollViewer.CanContentScroll="True">
+                        <ItemsControl.ItemTemplate>
+
+                            <DataTemplate DataType="{x:Type models:ICommandItem}">
+
+                                <Button Height="40"
+                                        Padding="12 0 12 0"
+                                        HorizontalContentAlignment="Left"
+                                        ToolTip="{Binding ToolTip}" 
+                                        ToolTipService.InitialShowDelay="0" 
+                                        Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                                        Style="{DynamicResource MaterialDesignFlatButton}"
+                                        Command="{Binding Command}">
+
+                                    <StackPanel Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <materialDesign:PackIcon Kind="{Binding IconKind}" />
+
+                                        <TextBlock Margin="12 0 0 0"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="14"
+                                                   Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                                   Text="{Binding Title, Mode=OneWay}"/>
+
+                                    </StackPanel>
+
+                                </Button>
+
+                            </DataTemplate>
+
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                </materialDesign:PopupBox>
+
+                <ContentControl Grid.Row="1" 
+                                Content="{Binding VariationData}"/>
+
+            </Grid>
+
+        </Border>
 
         <Grid Grid.Column="1">
-            <ComboBox
-                  materialDesign:HintAssist.Hint="Тип ряда"
-                  MinWidth="72"
-            HorizontalAlignment="Center"
-                  Margin="0 100 0 0"
-                  VerticalAlignment="Top"
-            SelectedItem="{Binding SelectedDistributionSeriesInputType}"
-                  ItemsSource="{Binding DistributionSeriesInputTypes}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-                <ComboBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ComboBox.ItemsPanel>
-            </ComboBox>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
-            <ComboBox x:Name="typeSeries"
-                  materialDesign:HintAssist.Hint="Тип распределения"
-                  MinWidth="72"
-            HorizontalAlignment="Center"
-                  
-                  Margin="0 150 0 0"
-                  VerticalAlignment="Top"
-            SelectedItem="{Binding SelectedDistributionType}"
-                  ItemsSource="{Binding DistributionTypes}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-                <ComboBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ComboBox.ItemsPanel>
-            </ComboBox>
+            <WrapPanel Grid.Row="0"
+                       Margin="12 48 12 24"
+                       HorizontalAlignment="Center">
+
+                <ComboBox Style="{StaticResource seriesTypeComboBoxStyle}"
+                          materialDesign:HintAssist.Hint="Тип ряда"
+                          Width="200"
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Left"
+                          SelectedItem="{Binding SelectedDistributionSeriesInputType}"
+                          ItemsSource="{Binding DistributionSeriesInputTypes}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
+
+                <materialDesign:TransitioningContent Grid.Row="1"
+                                                     Panel.ZIndex="-1"
+                                                     Visibility="{Binding SelectedDistributionSeriesInputType, Converter={StaticResource NullableToVisibilityConverter}}">
+                    <materialDesign:TransitioningContent.OpeningEffects>
+                        <materialDesign:TransitionEffect Kind="SlideInFromRight"/>
+                        <materialDesign:TransitionEffect Kind="FadeIn"/>
+                    </materialDesign:TransitioningContent.OpeningEffects>
+
+                    <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                          materialDesign:HintAssist.Hint="Тип распределения"
+                              Width="200"
+                              Margin="12 0 12 0"
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Left"
+                          SelectedItem="{Binding SelectedDistributionType}"
+                          ItemsSource="{Binding DistributionTypes}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+
+                </materialDesign:TransitioningContent>
+
+            </WrapPanel>
+
+            <Button Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="12"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+                    Command="{Binding CalculateVariationDataCommand}">
+                
+                <materialDesign:PackIcon Kind="ChevronDown"/>
+                
+            </Button>
+
+
+
+
+
         </Grid>
 
     </Grid>

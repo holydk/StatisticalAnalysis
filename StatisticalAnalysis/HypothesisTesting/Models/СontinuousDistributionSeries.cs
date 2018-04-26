@@ -6,7 +6,7 @@ namespace StatisticalAnalysis.HypothesisTesting.Models
 {
     public class СontinuousDistributionSeries : DistributionSeries
     {
-        public СontinuousDistributionSeries(IUnivariateDistribution univariateDistribution, ICollection<IVariationPair<Interval>> intervals)
+        public СontinuousDistributionSeries(IUnivariateDistribution univariateDistribution, ICollection<IVariationPair<Variant<Interval>>> intervals)
             : base(univariateDistribution, (ICollection<IVariationPair<object>>)intervals)
         { }
 
@@ -21,9 +21,9 @@ namespace StatisticalAnalysis.HypothesisTesting.Models
 
         public override double CumulativeDistribution(IVariationPair<object> variationPair)
         {
-            if (variationPair is IVariationPair<Interval> pair)
+            if (variationPair is IVariationPair<Variant<Interval>> pair)
             {
-                return CumulativeDistribution(pair.Variant);
+                return CumulativeDistribution(pair.Variant.Value);
             }
             else
             {

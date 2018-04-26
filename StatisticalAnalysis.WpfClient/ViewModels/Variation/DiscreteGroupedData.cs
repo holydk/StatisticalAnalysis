@@ -1,13 +1,17 @@
 ﻿using StatisticalAnalysis.HypothesisTesting.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
 {
-    public class DiscreteGroupedData : ObservableCollection<GroupSeriesDatum<int>>, IConvertToVariationPairs
+    public class DiscreteGroupedData : SeriesData<GroupSeriesDatum<int>>
     {
-        public IEnumerable<IVariationPair<object>> ToVariationPairs()
+        protected override GroupSeriesDatum<int> Parse(string item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ICollection<IVariationPair<object>> ToVariationPairs()
         {
             throw new NotImplementedException();
         }
