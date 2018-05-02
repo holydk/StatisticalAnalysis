@@ -1,5 +1,5 @@
-﻿using StatisticalAnalysis.Helpers;
-using StatisticalAnalysis.HypothesisTesting.Models;
+﻿using StatisticalAnalysis.WpfClient.Helpers;
+using StatisticalAnalysis.WpfClient.HypothesisTesting.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
             if (Data == null || Data.Count == 0) return null;
 
             var varPairs = new HashSet<IVariationPair<Variant<Interval>>>();
-            var numberOfIntervals = StatisticalAnalysisProvider.GetNumberOfIntervals(Data.Count);
+            var numberOfIntervals = Statistics.GetNumberOfIntervals(Data.Count);
             var min = Data.Min(datum => datum.Value);
             var max = Data.Max(datum => datum.Value);
             var step = (max - min) / numberOfIntervals;

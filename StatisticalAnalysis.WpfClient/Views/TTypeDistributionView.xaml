@@ -7,15 +7,19 @@
              xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient.Views"
              xmlns:helpers="clr-namespace:StatisticalAnalysis.WpfClient.Helpers"
              xmlns:models="clr-namespace:StatisticalAnalysis.WpfClient.Models"
+             xmlns:hypModels="clr-namespace:StatisticalAnalysis.WpfClient.HypothesisTesting.Models"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mdconverters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              xmlns:variation="clr-namespace:StatisticalAnalysis.WpfClient.ViewModels.Variation"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="500" d:DesignWidth="1000">
     <UserControl.Resources>
 
+        <helpers:THypothesisResultToVariantConverter x:Key="tHypothesisResultToVariantConverter"/>
         <helpers:EnumDescriptionConverter x:Key="enumToDescriptionConverter"/>
         <helpers:IntervalStringConverter x:Key="intervalStringConverter"/>
+        <helpers:DistributionTypeToDistributionSeriesTypeConverter x:Key="distributionTypeToDistributionSeriesTypeConverter"/>
         <mdconverters:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" NullValue="Hidden" NotNullValue="Visible"/>
 
         <Style x:Key="dataGridTextBlock" TargetType="{x:Type TextBlock}">
@@ -32,6 +36,16 @@
             <Setter Property="Height" Value="55"/>
         </Style>
 
+        <Style TargetType="lvc:Separator">
+            <Setter Property="StrokeThickness" Value="1"></Setter>
+            <Style.Triggers>
+                <Trigger Property="AxisOrientation" Value="X">
+                    <Setter Property="IsEnabled" Value="False"></Setter>
+                    <Setter Property="Step" Value="1"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="inputDataGrid" TargetType="{x:Type DataGrid}" BasedOn="{StaticResource MaterialDesignDataGrid}">
             <Setter Property="ItemsSource" Value="{Binding Data}"/>
             <Setter Property="CanUserAddRows" Value="True"/>
@@ -41,41 +55,10 @@
             <Setter Property="AutoGenerateColumns" Value="False"/>
             <Setter Property="ColumnWidth" Value="*"/>
             <Setter Property="Width" Value="200"/>
+            <!--<Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="Focusable" Value="False"/>-->
             <Setter Property="materialDesign:DataGridAssist.CellPadding" Value="13 8 8 8"/>
             <Setter Property="materialDesign:DataGridAssist.ColumnHeaderPadding" Value="4"/>
-        </Style>
-
-        <Style x:Key="seriesTypeComboBoxStyle" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource MaterialDesignFloatingHintComboBox}">
-            <Setter Property="Margin" Value="12 0 12 0"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding DataContext.SelectedDistributionSeriesInputType, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Value="{x:Null}">
-                    <DataTrigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
-                                                    Duration="0:0:0"
-                                                    To="12 0 -212 0">
-                                    <ThicknessAnimation.EasingFunction>
-                                        <SineEase EasingMode="EaseOut" />
-                                    </ThicknessAnimation.EasingFunction>
-                                </ThicknessAnimation>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </DataTrigger.EnterActions>
-                    <DataTrigger.ExitActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
-                                                    Duration="0:0:0.4">
-                                    <ThicknessAnimation.EasingFunction>
-                                        <SineEase EasingMode="EaseOut" />
-                                    </ThicknessAnimation.EasingFunction>
-                                </ThicknessAnimation>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </DataTrigger.ExitActions>
-                </DataTrigger>
-            </Style.Triggers>
         </Style>
 
         <Style x:Key="leftInputBorderStyle" TargetType="{x:Type Border}">
@@ -111,6 +94,39 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="inputFieldsTransitioningContentStyle" TargetType="{x:Type materialDesign:TransitioningContent}">
+            <Setter Property="Margin" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="Visibility" Value="Hidden">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0"
+                                                    To="0 0 -224 0">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0.4">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         
         <DataTemplate DataType="{x:Type variation:DiscreteData}">
 
@@ -118,7 +134,7 @@
                 <DataGrid.Columns>
 
                     <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
-                                                               Header="X"
+                                                               Header="X"                                                               
                                                                ElementStyle="{StaticResource dataGridTextBlock}"
                                                                EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
                                                                HeaderStyle="{StaticResource dataGridColumnHeader}"/>
@@ -199,7 +215,7 @@
         </DataTemplate>
 
     </UserControl.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -280,7 +296,8 @@
 
         </Border>
 
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1"
+              Margin="12 48 12 24">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -288,16 +305,16 @@
             </Grid.RowDefinitions>
 
             <WrapPanel Grid.Row="0"
-                       Margin="12 48 12 24"
                        HorizontalAlignment="Center">
 
-                <ComboBox Style="{StaticResource seriesTypeComboBoxStyle}"
-                          materialDesign:HintAssist.Hint="Тип ряда"
+                <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                          materialDesign:HintAssist.Hint="Тип распределения"
                           Width="200"
+                          Margin="12 0 12 0"
                           VerticalAlignment="Top"
                           HorizontalAlignment="Left"
-                          SelectedItem="{Binding SelectedDistributionSeriesInputType}"
-                          ItemsSource="{Binding DistributionSeriesInputTypes}">
+                          SelectedItem="{Binding SelectedDistributionType}"
+                          ItemsSource="{Binding DistributionTypes}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
@@ -310,22 +327,45 @@
                     </ComboBox.ItemsPanel>
                 </ComboBox>
 
-                <materialDesign:TransitioningContent Grid.Row="1"
-                                                     Panel.ZIndex="-1"
-                                                     Visibility="{Binding SelectedDistributionSeriesInputType, Converter={StaticResource NullableToVisibilityConverter}}">
+                <materialDesign:TransitioningContent Style="{StaticResource inputFieldsTransitioningContentStyle}"
+                                                     Visibility="{Binding SelectedDistributionType, Converter={StaticResource NullableToVisibilityConverter}}">
                     <materialDesign:TransitioningContent.OpeningEffects>
                         <materialDesign:TransitionEffect Kind="SlideInFromRight"/>
                         <materialDesign:TransitionEffect Kind="FadeIn"/>
                     </materialDesign:TransitioningContent.OpeningEffects>
 
                     <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                          materialDesign:HintAssist.Hint="Тип распределения"
+                              materialDesign:HintAssist.Hint="Уровень значимости"
                               Width="200"
                               Margin="12 0 12 0"
-                          VerticalAlignment="Top"
-                          HorizontalAlignment="Left"
-                          SelectedItem="{Binding SelectedDistributionType}"
-                          ItemsSource="{Binding DistributionTypes}">
+                              VerticalAlignment="Top"
+                              HorizontalAlignment="Left"
+                              SelectedItem="{Binding SelectedSignificanceLevel}"
+                              ItemsSource="{Binding SignificanceLevels}">
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+
+                </materialDesign:TransitioningContent>
+
+                <materialDesign:TransitioningContent Style="{StaticResource inputFieldsTransitioningContentStyle}"
+                                                     Visibility="{Binding SelectedSignificanceLevel, Converter={StaticResource NullableToVisibilityConverter}}">
+                    <materialDesign:TransitioningContent.OpeningEffects>
+                        <materialDesign:TransitionEffect Kind="SlideInFromRight"/>
+                        <materialDesign:TransitionEffect Kind="FadeIn"/>
+                    </materialDesign:TransitioningContent.OpeningEffects>
+
+                    <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Тип ряда"
+                              Width="200"
+                              Margin="12 0 12 0"
+                              VerticalAlignment="Top"
+                              HorizontalAlignment="Left"
+                              SelectedItem="{Binding SelectedDistributionSeriesInputType}"
+                              ItemsSource="{Binding DistributionSeriesInputTypes}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
@@ -349,14 +389,215 @@
                     VerticalAlignment="Center"
                     Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
                     Command="{Binding CalculateVariationDataCommand}">
-                
-                <materialDesign:PackIcon Kind="ChevronDown"/>
-                
+
+                <materialDesign:PackIcon Kind="ChevronUp"/>
+
             </Button>
 
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <DataGrid Style="{StaticResource MaterialDesignDataGrid}"
+                          ItemsSource="{Binding THypothesis.Results}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          CanUserReorderColumns="False"
+                          CanUserResizeColumns="False"
+                          CanUserSortColumns="False"
+                          CanUserResizeRows="False" 
+                          IsReadOnly="True"
+                          Margin="0,0,0,24">
+                    <DataGrid.Columns>
+
+                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Number}"
+                                                                   Header="№"
+                                                                   HeaderStyle="{StaticResource MaterialDesignDataGridColumnHeader}"/>
+                        
+                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Variant}"
+                                                                   ElementStyle="{StaticResource dataGridTextBlock}">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Row="0">Интервал</TextBlock>
+
+                                                <TextBlock Grid.Row="1" HorizontalAlignment="Center"><Run>x</Run><Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                            </Grid>
+
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.SelectedDistributionType, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Converter={StaticResource distributionTypeToDistributionSeriesTypeConverter}}" Value="{x:Static hypModels:DistributionSeriesType.Сontinuous}">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+
+                                                    
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+
+                                                        <TextBlock Grid.Row="0">Интервал</TextBlock>
+
+                                                        <TextBlock Grid.Row="1" VerticalAlignment="Center">x<Run Text="i" BaselineAlignment="Subscript"/> - x<Run Text="i + 1" BaselineAlignment="Subscript"/></TextBlock>
+
+                                                    </Grid>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </materialDesign:MaterialDataGridTextColumn>
+
+                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding EmpiricalFrequency}">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0">Эмп. частоты</TextBlock>
+
+                                                <TextBlock Grid.Row="1" HorizontalAlignment="Center"><Run>n</Run><Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                            </Grid>
+
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </materialDesign:MaterialDataGridTextColumn>
+
+                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Probability}">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Row="0">Вероятности</TextBlock>
+
+                                                <TextBlock Grid.Row="1" HorizontalAlignment="Center"><Run>p</Run><Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                            </Grid>
+
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </materialDesign:MaterialDataGridTextColumn>
 
 
+                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding TheoreticalFrequency}">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
 
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Row="0">Теор. частоты</TextBlock>
+
+                                                <TextBlock Grid.Row="1" HorizontalAlignment="Center">n*p<Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                            </Grid>
+
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </materialDesign:MaterialDataGridTextColumn>
+
+                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Criterion1}">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+
+                                            <TextBlock>(n<Run Text="i - n*p" BaselineAlignment="Subscript"/><Run Text="i" BaselineAlignment="Subscript"/>)<Run Text="2" BaselineAlignment="Superscript"/></TextBlock>
+
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </materialDesign:MaterialDataGridTextColumn>
+
+                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Criterion2}">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+
+                                            <StackPanel Orientation="Vertical">
+                                                
+                                                <TextBlock x:Name="criterion2TextBlock">
+                                                
+                                                    (n<Run Text="i - n*p" BaselineAlignment="Subscript"/><Run Text="i" BaselineAlignment="Subscript"/>)<Run Text="2" BaselineAlignment="Superscript"/>
+
+                                                </TextBlock>
+
+                                                <Line X1="0" X2="59" Stroke="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridColumnHeader}}}" Margin="0,2,0,0"/>
+
+                                                <TextBlock Grid.Row="1" HorizontalAlignment="Center">n*p<Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                            </StackPanel>
+
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </materialDesign:MaterialDataGridTextColumn>
+
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <lvc:CartesianChart Grid.Row="1" 
+                                    Series="{Binding THypothesis.Series}" 
+                                    LegendLocation="Top"
+                                    HorizontalAlignment="Center"
+                                    Width="500">
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis MinValue="0"/>
+                    </lvc:CartesianChart.AxisY>
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis Name="xAxis" ShowLabels="True" Labels="{Binding THypothesis.Results, Converter={StaticResource tHypothesisResultToVariantConverter}}"/>
+                    </lvc:CartesianChart.AxisX>
+                </lvc:CartesianChart>
+
+            </Grid>            
 
         </Grid>
 

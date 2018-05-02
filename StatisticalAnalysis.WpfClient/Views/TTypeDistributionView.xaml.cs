@@ -23,6 +23,7 @@ namespace StatisticalAnalysis.WpfClient.Views
             if (viewModel is TTypeDistributionViewModel distrVM)
             {
                 distrVM.VariationData = null;
+                distrVM.SelectedSignificanceLevel = null;
                 distrVM.SelectedDistributionType = null;
                 distrVM.SelectedDistributionSeriesInputType = null;
             }

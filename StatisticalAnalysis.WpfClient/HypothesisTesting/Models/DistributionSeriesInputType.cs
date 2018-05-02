@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace StatisticalAnalysis.WpfClient.Models
+namespace StatisticalAnalysis.WpfClient.HypothesisTesting.Models
 {
     public enum DistributionSeriesInputType
     {

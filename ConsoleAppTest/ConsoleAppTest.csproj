@@ -54,11 +54,5 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\StatisticalAnalysis\StatisticalAnalysis.csproj">
-      <Project>{5de0ca38-3a4d-412d-a6f4-dc661f04a0e0}</Project>
-      <Name>StatisticalAnalysis</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

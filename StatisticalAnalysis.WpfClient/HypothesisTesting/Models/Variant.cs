@@ -1,4 +1,4 @@
-﻿namespace StatisticalAnalysis.HypothesisTesting.Models
+﻿namespace StatisticalAnalysis.WpfClient.HypothesisTesting.Models
 {
     public class Variant<T>
     {

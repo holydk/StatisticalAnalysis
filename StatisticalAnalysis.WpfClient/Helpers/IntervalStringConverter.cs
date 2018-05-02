@@ -1,4 +1,4 @@
-﻿using StatisticalAnalysis.HypothesisTesting.Models;
+﻿using StatisticalAnalysis.WpfClient.HypothesisTesting.Models;
 using System;
 using System.Globalization;
 using System.Text.RegularExpressions;

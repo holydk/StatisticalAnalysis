@@ -1,4 +1,4 @@
-﻿using StatisticalAnalysis.HypothesisTesting.Models;
+﻿using StatisticalAnalysis.WpfClient.HypothesisTesting.Models;
 using StatisticalAnalysis.WpfClient.Models;
 using System.Collections.Generic;
 

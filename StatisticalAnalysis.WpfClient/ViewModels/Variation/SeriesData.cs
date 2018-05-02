@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
-using StatisticalAnalysis.HypothesisTesting.Models;
 using StatisticalAnalysis.WpfClient.Helpers;
+using StatisticalAnalysis.WpfClient.HypothesisTesting.Models;
 using StatisticalAnalysis.WpfClient.Models;
 
 namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
@@ -36,17 +37,26 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
 
             var data = await FileHelper.ReadCsvAsync(fileName, ';');
 
-            ParseData(data);
+            FixDefaultErrors(data);
+
+            var parsedData = ParseData(data);
+
+            FixParsedData(parsedData);
+            ClearData();
+
+            foreach (var item in parsedData)
+            {
+                Data.Add(item);
+            }
         }
 
-        protected virtual void ParseData(string[] data)
+        protected virtual ICollection<TDatum> ParseData(IEnumerable<string> data)
         {
             var parsedData = new List<TDatum>();
+            TDatum datum = null;
 
             foreach (var item in data)
             {
-                TDatum datum = null;
-
                 if (string.IsNullOrWhiteSpace(item))
                     datum = new TDatum();
                 else                
@@ -55,15 +65,28 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
                 parsedData.Add(datum);
             }
 
-            foreach (var item in parsedData)
+            return parsedData;         
+        }
+
+        protected virtual void FixParsedData(ICollection<TDatum> data) { }
+
+        private void FixDefaultErrors(string[] data)
+        {
+            for (int i = 0; i < data.Length; i++)
             {
-                Data.Add(item);
+                // Eng
+                if (data[i].Contains('o'))
+                    data[i] = data[i].Replace('o', '0');
+
+                // Rus
+                if (data[i].Contains('о'))
+                    data[i] = data[i].Replace('о', '0');
             }
         }
 
-        protected abstract TDatum Parse(string item);
-
         public void ClearData() => Data?.Clear();
+
+        protected abstract TDatum Parse(string item);
 
         public abstract ICollection<IVariationPair<object>> ToVariationPairs();
     }

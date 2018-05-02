@@ -1,6 +1,7 @@
-﻿using StatisticalAnalysis.HypothesisTesting.Models;
+﻿using StatisticalAnalysis.WpfClient.HypothesisTesting.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
 {
@@ -13,7 +14,16 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
 
         public override ICollection<IVariationPair<object>> ToVariationPairs()
         {
-            throw new NotImplementedException();
+            if (Data == null || Data.Count == 0) return null;
+
+            var data = new HashSet<IVariationPair<Variant<int>>>();
+
+            foreach (var item in Data.OrderBy(d => d.Variant))
+            {
+                data.Add(new VariationPair<Variant<int>>(new Variant<int>(item.Variant), item.Value));
+            }
+
+            return data.ToArray();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using StatisticalAnalysis.HypothesisTesting.Models;
+﻿using StatisticalAnalysis.WpfClient.HypothesisTesting.Models;
 
 namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
 {
@@ -39,6 +39,11 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
         {
             get => Get(() => Variant);
             set => Set(() => Variant, value);
+        }
+
+        public GroupSeriesDatum()
+        {
+            AddRule(() => Value, () => Value > 0, "Частота должны быть больше нуля.");
         }
     }
 

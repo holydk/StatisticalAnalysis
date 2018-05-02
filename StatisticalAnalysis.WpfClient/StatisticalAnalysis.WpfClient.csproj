@@ -52,6 +52,12 @@
     <ApplicationIcon>Resources\math_stats_icon_ico.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignColors, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
     </Reference>
@@ -84,11 +90,23 @@
     </Compile>
     <Compile Include="Controls\SearchTextBox.cs" />
     <Compile Include="Helpers\DescriptionProvider.cs" />
+    <Compile Include="Helpers\DistributionTypeToDistributionSeriesTypeConverter.cs" />
     <Compile Include="Helpers\EnumDescriptionConverter.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Helpers\IntervalStringConverter.cs" />
+    <Compile Include="Helpers\Statistics.cs" />
+    <Compile Include="Helpers\THypothesisResultToVariantConverter.cs" />
+    <Compile Include="HypothesisTesting\Models\DistributionSeriesType.cs" />
+    <Compile Include="HypothesisTesting\Models\DistributionType.cs" />
+    <Compile Include="HypothesisTesting\Models\Interval.cs" />
+    <Compile Include="HypothesisTesting\Models\IVariationPair.cs" />
+    <Compile Include="HypothesisTesting\Models\TypeOfDistributionSeriesAttribute.cs" />
+    <Compile Include="HypothesisTesting\Models\Variant.cs" />
+    <Compile Include="HypothesisTesting\Models\VariationPair.cs" />
+    <Compile Include="HypothesisTesting\TDiscreteUniform.cs" />
+    <Compile Include="HypothesisTesting\TNormal.cs" />
     <Compile Include="Models\CommandItem.cs" />
-    <Compile Include="Models\DistributionSeriesInputType.cs" />
+    <Compile Include="HypothesisTesting\Models\DistributionSeriesInputType.cs" />
     <Compile Include="Models\FileExtension.cs" />
     <Compile Include="Models\ICommandItem.cs" />
     <Compile Include="Models\IConvertFromFile.cs" />
@@ -106,6 +124,9 @@
     <Compile Include="Models\INavigation.cs" />
     <Compile Include="Models\TabItem.cs" />
     <Compile Include="Controls\IndexedItemsControl.cs" />
+    <Compile Include="HypothesisTesting\Models\THypothesisResult.cs" />
+    <Compile Include="HypothesisTesting\TBinomial.cs" />
+    <Compile Include="HypothesisTesting\THypothesis.cs" />
     <Compile Include="ViewModels\CorRegAnalysisViewModel.cs" />
     <Compile Include="ViewModels\ForecastingTimeSeriesViewModel.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
@@ -248,12 +269,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\math_stats_icon_ico.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\StatisticalAnalysis\StatisticalAnalysis.csproj">
-      <Project>{5de0ca38-3a4d-412d-a6f4-dc661f04a0e0}</Project>
-      <Name>StatisticalAnalysis</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

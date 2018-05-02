@@ -34,13 +34,25 @@ namespace StatisticalAnalysis.WpfClient.Helpers
             return Encoding.UTF8.GetString(data);
         }
 
+        public async static Task<string> ReadFileAsync(string filename, Encoding encoding)
+        {
+            var data = string.Empty;
+
+            using (var reader = new StreamReader(filename, encoding))
+            {
+                data = await reader.ReadToEndAsync();
+            }
+
+            return data;
+        }
+
         public async static Task<string[]> ReadCsvAsync(string fileName, char seperator)
         {
-            var data = await GetStringFromFileAsync(fileName);
+            var data = await ReadFileAsync(fileName, Encoding.Default);
             var stringBuilder = new StringBuilder(data);
 
             return stringBuilder
-                .Replace("\r", "")
+                .Replace("\r", string.Empty)
                 .Replace("\n", seperator.ToString())
                 .ToString()
                 .TrimEnd(seperator)

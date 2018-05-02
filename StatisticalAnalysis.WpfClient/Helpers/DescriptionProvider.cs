@@ -1,4 +1,4 @@
-﻿using StatisticalAnalysis.HypothesisTesting.Models;
+﻿using StatisticalAnalysis.WpfClient.HypothesisTesting.Models;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -13,7 +13,6 @@ namespace StatisticalAnalysis.WpfClient.Helpers
             fieldInfo.GetCustomAttribute<TypeOfDistributionSeriesAttribute>(false)?.DistributionSeriesType;
 
         public static DistributionSeriesType? ToDistributionSeriesType(this DistributionType distributionType) =>
-            distributionType.GetType().GetField(distributionType.ToString()).ToDistributionSeriesType();
-        
+            distributionType.GetType().GetField(distributionType.ToString()).ToDistributionSeriesType();       
     }
 }
