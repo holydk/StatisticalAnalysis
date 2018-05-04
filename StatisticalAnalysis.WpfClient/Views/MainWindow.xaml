@@ -23,11 +23,6 @@
 
     <Window.Resources>
 
-        <Style TargetType="{x:Type Run}">
-            <Setter Property="Cursor" Value="Hand"/>
-            <EventSetter Event="MouseDown" Handler="Run_MouseDown"/>
-        </Style>
-
         <Style TargetType="{x:Type materialDesign:PackIcon}">
             <Setter Property="Width" Value="20"/>
             <Setter Property="Height" Value="20"/>
@@ -136,6 +131,14 @@
                                    Margin="36 0 0 0"
                                    TextTrimming="CharacterEllipsis"
                                    FontSize="16">
+                            <TextBlock.Resources>
+
+                                <Style TargetType="{x:Type Run}">
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <EventSetter Event="MouseDown" Handler="Run_MouseDown"/>
+                                </Style>
+
+                            </TextBlock.Resources>
 
                             <Run x:Name="mainTitle"/>
 

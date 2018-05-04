@@ -8,6 +8,8 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
 {
     public class TDiscreteUniform : THypothesis
     {
+        protected override int _r => 2;
+
         public TDiscreteUniform(ICollection<IVariationPair<Variant<int>>> discretePairs, double significanceLevel)
             : base(significanceLevel)
         {
@@ -17,9 +19,7 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
                 discretePairs.First().Variant.Value, 
                 discretePairs.Last().Variant.Value);
 
-            Execute(discretePairs, v => _univariateDistribution.CumulativeDistribution(v.Value));
-
-            _criticalValue = ChiSquared.InvCDF(discretePairs.Count - 3, 1 - significanceLevel);
+            Execute(discretePairs, v => _univariateDistribution.CumulativeDistribution(v.Value));           
         }
     }
 }

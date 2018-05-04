@@ -8,6 +8,8 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
 {
     public class TNormal : THypothesis
     {
+        protected override int _r => 2;
+
         public TNormal(ICollection<IVariationPair<Variant<Interval>>> intervals, double significanceLevel)
             : base(significanceLevel)
         {
@@ -21,8 +23,6 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
 
             Execute(intervals, v => _univariateDistribution.CumulativeDistribution(v.Value.Upper) -
                     _univariateDistribution.CumulativeDistribution(v.Value.Lower));
-
-            _criticalValue = ChiSquared.InvCDF(intervals.Count - 3, 1 - significanceLevel);
         }
     }
 }

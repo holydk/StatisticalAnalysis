@@ -8,6 +8,8 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
 {
     public class TBinomial : THypothesis
     {
+        protected override int _r => 2;
+
         public TBinomial(ICollection<IVariationPair<Variant<int>>> discretePairs, double significanceLevel)
             : base(significanceLevel)
         {
@@ -21,8 +23,6 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
             _univariateDistribution = binomial;
 
             Execute(discretePairs, v => binomial.Probability(v.Value));
-
-            _criticalValue = ChiSquared.InvCDF(discretePairs.Count - 3, 1 - significanceLevel);
         }
     }
 }

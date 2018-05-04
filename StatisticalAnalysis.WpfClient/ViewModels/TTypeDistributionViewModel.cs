@@ -7,6 +7,7 @@ using StatisticalAnalysis.WpfClient.ViewModels.Variation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 
@@ -19,6 +20,8 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
         public IEnumerable<DistributionSeriesInputType> DistributionSeriesInputTypes { get; }
 
         public IEnumerable<ICommandItem> CommandItems { get; }
+
+        public IEnumerable<ICommandItem> ResultCommandItems { get; }
 
         public IEnumerable<double> SignificanceLevels { get; }
 
@@ -60,6 +63,12 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             set => Set(() => THypothesis, value);
         }
 
+        public bool IsResult
+        {
+            get => Get(() => IsResult);
+            set => Set(() => IsResult, value);
+        }
+
         public TTypeDistributionViewModel()
             : base("О законе распределения")
         {
@@ -82,6 +91,11 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             {
                 new CommandItem("Загрузить", MaterialDesignThemes.Wpf.PackIconKind.Upload, ReadDataFromFileCommand),
                 new CommandItem("Очистить", MaterialDesignThemes.Wpf.PackIconKind.Delete, new RelayCommand((sender) => VariationData?.ClearData()))
+            };
+
+            ResultCommandItems = new ICommandItem[]
+            {
+                new CommandItem("Сохранить", MaterialDesignThemes.Wpf.PackIconKind.ContentSave, SaveResultCommand)
             };
         }
 
@@ -128,24 +142,52 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
 
         public ICommand CalculateVariationDataCommand
         {
-            get => Get(() => CalculateVariationDataCommand, new RelayCommand((sender) =>
-            {
-                //IsBusy = true;
-
+            get => Get(() => CalculateVariationDataCommand, new RelayCommand(async (sender) =>
+            {                             
                 if (VariationData == null) return;
 
                 var varPairs = VariationData.ToVariationPairs();
 
                 if (varPairs == null || varPairs.Any(p => p.Frequency == 0))
                 {
-                    MessageBox.Show("Некорректные данные.");
+                    //MessageBox.Show("Некорректные данные.");
 
                     return;
                 }
 
+                IsBusy = true;
+
+                await Task.Delay(3000);
+
                 SetTHypothesis(varPairs);
-                
+
+                if (THypothesis != null)
+                {
+                    IsBusy = false;
+                    IsResult = true;
+                }
             }, () => !IsBusy && VariationData != null && SelectedDistributionType != null && SelectedDistributionSeriesInputType != null && SelectedSignificanceLevel != null));
+        }
+
+        public ICommand BackToInputDataCommand
+        {
+            get => Get(() => BackToInputDataCommand, new RelayCommand(async (sender) =>
+            {
+                IsBusy = true;
+
+                await Task.Delay(250);
+
+                IsBusy = false;
+                IsResult = false;
+            }));
+        }
+
+        public ICommand SaveResultCommand
+        {
+            get => Get(() => SaveResultCommand, new RelayCommand((sender) =>
+            {
+                
+            }));
         }
 
         private void SetTHypothesis(ICollection<IVariationPair<object>> varPairs)
