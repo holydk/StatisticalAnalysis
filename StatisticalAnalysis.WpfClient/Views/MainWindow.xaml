@@ -14,6 +14,7 @@
         TextElement.FontWeight="Regular"
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"
+        FontSize="14"
         Style="{StaticResource MainWindowStyle}"
         FontFamily="{DynamicResource MaterialDesignFont}"
         Width="800"
@@ -21,11 +22,6 @@
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-
-        <Style TargetType="{x:Type Run}">
-            <Setter Property="Cursor" Value="Hand"/>
-            <EventSetter Event="MouseDown" Handler="Run_MouseDown"/>
-        </Style>
 
         <Style TargetType="{x:Type materialDesign:PackIcon}">
             <Setter Property="Width" Value="20"/>
@@ -48,7 +44,7 @@
 
         <Storyboard x:Key="CloseInfoBox">
             <ThicknessAnimation Storyboard.TargetProperty="Margin" 
-                                                    Duration="0:0:0.4">
+                                Duration="0:0:0.4">
                 <ThicknessAnimation.EasingFunction>
                     <SineEase EasingMode="EaseOut" />
                 </ThicknessAnimation.EasingFunction>
@@ -135,6 +131,14 @@
                                    Margin="36 0 0 0"
                                    TextTrimming="CharacterEllipsis"
                                    FontSize="16">
+                            <TextBlock.Resources>
+
+                                <Style TargetType="{x:Type Run}">
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <EventSetter Event="MouseDown" Handler="Run_MouseDown"/>
+                                </Style>
+
+                            </TextBlock.Resources>
 
                             <Run x:Name="mainTitle"/>
 

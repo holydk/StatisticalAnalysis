@@ -4,6 +4,8 @@
     {
         string Title { get; }
 
+        bool IsBusy { get; set; }
+
         void Search(object sender);
     }
 }

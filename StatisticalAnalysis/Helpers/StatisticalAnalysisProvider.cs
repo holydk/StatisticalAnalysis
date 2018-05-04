@@ -10,14 +10,14 @@ namespace StatisticalAnalysis.Helpers
         /// </summary>
         /// <param name="count">The number of units in the aggregate</param>
         /// <returns></returns>
-        public static decimal GetNumberOfIntervals(decimal count)
+        public static int GetNumberOfIntervals(decimal count)
         {
             if (count <= decimal.Zero) return 0;
             
             if (decimal.ToDouble(count) > double.MaxValue)
                 throw new ArgumentOutOfRangeException(nameof(count));
 
-            return (decimal)Math.Round(1 + 3.32 * Math.Log10((double)count));
+            return (int)Math.Round(1 + 3.32 * Math.Log10((double)count));
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace StatisticalAnalysis.Helpers
                 max <= 0)
                 return 0;
 
-            return (max - min) / (double)GetNumberOfIntervals(count);
+            return (max - min) / GetNumberOfIntervals(count);
         }
     }
 }

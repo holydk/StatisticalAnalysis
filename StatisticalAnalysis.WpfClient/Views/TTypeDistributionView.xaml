@@ -2,19 +2,25 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:controls="clr-namespace:StatisticalAnalysis.WpfClient.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:StatisticalAnalysis.WpfClient.Views"
              xmlns:helpers="clr-namespace:StatisticalAnalysis.WpfClient.Helpers"
-             xmlns:models="clr-namespace:StatisticalAnalysis.HypothesisTesting.Models;assembly=StatisticalAnalysis"
+             xmlns:models="clr-namespace:StatisticalAnalysis.WpfClient.Models"
+             xmlns:hypModels="clr-namespace:StatisticalAnalysis.WpfClient.HypothesisTesting.Models"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mdconverters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              xmlns:variation="clr-namespace:StatisticalAnalysis.WpfClient.ViewModels.Variation"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             mc:Ignorable="d"
+             d:DesignHeight="1000" d:DesignWidth="1000">
     <UserControl.Resources>
 
+        <helpers:THypothesisResultToVariantConverter x:Key="tHypothesisResultToVariantConverter"/>
         <helpers:EnumDescriptionConverter x:Key="enumToDescriptionConverter"/>
         <helpers:IntervalStringConverter x:Key="intervalStringConverter"/>
+        <helpers:DistributionTypeToDistributionSeriesTypeConverter x:Key="distributionTypeToDistributionSeriesTypeConverter"/>
+        <mdconverters:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" NullValue="Hidden" NotNullValue="Visible"/>
+        <mdconverters:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" FalseValue="Collapsed" TrueValue="Visible"/>
 
         <Style x:Key="dataGridTextBlock" TargetType="{x:Type TextBlock}">
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -30,179 +36,973 @@
             <Setter Property="Height" Value="55"/>
         </Style>
 
+        <Style TargetType="lvc:Separator">
+            <Setter Property="StrokeThickness" Value="1"></Setter>
+            <Style.Triggers>
+                <Trigger Property="AxisOrientation" Value="X">
+                    <Setter Property="IsEnabled" Value="False"></Setter>
+                    <Setter Property="Step" Value="1"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="inputDataGrid" TargetType="{x:Type DataGrid}" BasedOn="{StaticResource MaterialDesignDataGrid}">
-            <Setter Property="ItemsSource" Value="{Binding}"/>
+            <Setter Property="ItemsSource" Value="{Binding Data}"/>
             <Setter Property="CanUserAddRows" Value="True"/>
             <Setter Property="CanUserSortColumns" Value="False"/>
+            <Setter Property="CanUserResizeColumns" Value="False"/>
+            <Setter Property="CanUserResizeRows" Value="False"/>
             <Setter Property="AutoGenerateColumns" Value="False"/>
-            <Setter Property="ColumnWidth" Value="100"/>
-            <Setter Property="MinColumnWidth" Value="80"/>
-            <Setter Property="MaxColumnWidth" Value="180"/>
+            <Setter Property="ColumnWidth" Value="*"/>
+            <Setter Property="Width" Value="200"/>
             <Setter Property="materialDesign:DataGridAssist.CellPadding" Value="13 8 8 8"/>
             <Setter Property="materialDesign:DataGridAssist.ColumnHeaderPadding" Value="4"/>
         </Style>
 
+        <Style x:Key="leftInputBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Opacity" Value="1"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding VariationData}" Value="{x:Null}">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0"
+                                                    To="-200 0 0 0"/>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                 Duration="0:0:0"
+                                                 To="0"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0.4">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                 Duration="0:0:0.4">
+                                    <DoubleAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="inputFieldsTransitioningContentStyle" TargetType="{x:Type materialDesign:TransitioningContent}">
+            <Setter Property="Margin" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="Visibility" Value="Hidden">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0"
+                                                    To="0 0 -224 0"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0.4">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="resultGridStyle" TargetType="{x:Type Grid}">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Opacity" Value="1"/>
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsBusy}" Value="true"/>
+                        <Condition Binding="{Binding IsResult}" Value="true"/>
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0.4"
+                                                    To="0 200 0 0">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                 Duration="0:0:0.4"
+                                                 To="0">
+                                    <DoubleAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </MultiDataTrigger.EnterActions>
+                    <MultiDataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" 
+                                                    Duration="0:0:0"/>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                 Duration="0:0:0"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </MultiDataTrigger.ExitActions>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="resultScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
+            <Setter Property="VerticalScrollBarVisibility" Value="Hidden"/>
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsBusy}" Value="true"/>
+                        <Condition Binding="{Binding IsResult}" Value="true"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="VerticalScrollBarVisibility" Value="Hidden"/>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsBusy}" Value="false"/>
+                        <Condition Binding="{Binding IsResult}" Value="true"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="VerticalScrollBarVisibility" Value="Visible"/>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="resultContentControlStyle" TargetType="{x:Type ContentControl}">
+            <Setter Property="Content">
+                <Setter.Value>
+
+                    <Grid Style="{StaticResource resultGridStyle}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <materialDesign:TransitioningContent Grid.Row="0"
+                                                             OpeningEffectsOffset="{materialDesign:IndexedItemOffsetMultiplier 0:0:5}">
+                            <materialDesign:TransitioningContent.OpeningEffects>
+                                <materialDesign:TransitionEffect Kind="SlideInFromTop"/>
+                                <materialDesign:TransitionEffect Kind="FadeIn"/>
+                            </materialDesign:TransitioningContent.OpeningEffects>
+
+                            <materialDesign:ColorZone Background="White"
+                                                      Padding="24"
+                                                      materialDesign:ShadowAssist.ShadowDepth="Depth0"
+                                                      BorderThickness="0 0 0 1"
+                                                      BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}">
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Grid.Column="0"
+                                            Style="{StaticResource MaterialDesignToolButton}"
+                                            ToolTip="Назад"
+                                            Width="20"
+                                            Command="{Binding BackToInputDataCommand}">
+
+                                        <materialDesign:PackIcon Kind="ChevronLeft"
+                                                                 Margin="-3 0 0 0"
+                                                                 Foreground="{DynamicResource MaterialDesignLightForeground}"/>
+
+                                    </Button>
+                                    
+                                    <StackPanel Grid.Column="1"
+                                                Orientation="Vertical"
+                                                Margin="36 0 0 0">
+
+                                        <TextBlock Text="Проверка гипотезы"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   FontSize="22"
+                                                   Style="{StaticResource MaterialDesignTitleTextBlock}"/>
+
+                                        <TextBlock Opacity=".5"
+                                                   TextTrimming="CharacterEllipsis">
+                                            <Run Text="{Binding SelectedDistributionType, Converter={StaticResource enumToDescriptionConverter}}"/> распределение при уровне значимости <Run Text="{Binding SelectedSignificanceLevel}"/>.
+                                        </TextBlock>
+
+                                    </StackPanel>
+
+                                    <materialDesign:PopupBox Grid.Column="2"
+                                                             PlacementMode="BottomAndAlignRightEdges" 
+                                                             StaysOpen="False">
+                                        <materialDesign:PopupBox.ToggleContent>
+
+                                            <materialDesign:PackIcon Kind="DotsHorizontal"/>
+
+                                        </materialDesign:PopupBox.ToggleContent>
+
+                                        <ItemsControl ItemsSource="{Binding ResultCommandItems}"
+                                                      VirtualizingStackPanel.IsVirtualizing="True"
+                                                      VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                                      ScrollViewer.CanContentScroll="True">
+                                            <ItemsControl.ItemTemplate>
+
+                                                <DataTemplate DataType="{x:Type models:ICommandItem}">
+
+                                                    <Button Height="40"
+                                                            Padding="12 0 12 0"
+                                                            HorizontalContentAlignment="Left"
+                                                            ToolTip="{Binding ToolTip}" 
+                                                            ToolTipService.InitialShowDelay="0" 
+                                                            Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                                                            Style="{DynamicResource MaterialDesignFlatButton}"
+                                                            Command="{Binding Command}">
+
+                                                        <StackPanel Orientation="Horizontal"
+                                                                    VerticalAlignment="Center">
+
+                                                            <materialDesign:PackIcon Kind="{Binding IconKind}" />
+
+                                                            <TextBlock Margin="12 0 0 0"
+                                                                       VerticalAlignment="Center"
+                                                                       FontSize="14"
+                                                                       Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                                                       Text="{Binding Title, Mode=OneWay}"/>
+
+                                                        </StackPanel>
+
+                                                    </Button>
+
+                                                </DataTemplate>
+
+                                            </ItemsControl.ItemTemplate>
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <VirtualizingStackPanel Orientation="Vertical" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                        </ItemsControl>
+
+                                    </materialDesign:PopupBox>
+
+                                </Grid>
+
+                            </materialDesign:ColorZone>
+
+                        </materialDesign:TransitioningContent>
+
+                        <materialDesign:TransitioningContent Grid.Row="1"
+                                                             Panel.ZIndex="-1"
+                                                             OpeningEffectsOffset="{materialDesign:IndexedItemOffsetMultiplier 0:0:5}">
+                            <materialDesign:TransitioningContent.OpeningEffects>
+                                <materialDesign:TransitionEffect Kind="SlideInFromBottom"/>
+                                <materialDesign:TransitionEffect Kind="FadeIn"/>
+                            </materialDesign:TransitioningContent.OpeningEffects>
+
+                            <ScrollViewer Grid.Row="1"
+                                          VerticalScrollBarVisibility="Hidden"
+                                          x:Name="PART_resultScrollViewer">
+
+                                <StackPanel Orientation="Vertical">
+
+                                    <materialDesign:ColorZone Mode="Light"
+                                                              Padding="24"
+                                                              BorderThickness="0 0 0 1"
+                                                              BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}">
+                                        <StackPanel Orientation="Vertical">
+
+                                            <TextBlock Text="Статистика вариационного ряда"
+                                                       Style="{StaticResource MaterialDesignTitleTextBlock}"/>
+
+                                            <TextBlock Opacity=".5">
+                                                По критерию согласия Пирсона.
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0 12 0 12"
+                                                       TextWrapping="Wrap">
+                                                Сравним эмпирические и теоретические частоты. Составим расчетную таблицу, из которой найдем наблюдаемое значение критерия:
+                                            </TextBlock>
+
+                                            <TextBlock HorizontalAlignment="Center">
+                                                K = Σ
+                                                <InlineUIContainer>
+                                                    <StackPanel Orientation="Vertical" Margin="0,0,0,-13">
+
+                                                        <TextBlock x:Name="criterion2TextBlock">
+                                                
+                                                            (n<Run Text="i - n*p" BaselineAlignment="Subscript"/><Run Text="i" BaselineAlignment="Subscript"/>)<Run Text="2" BaselineAlignment="Superscript"/>
+
+                                                        </TextBlock>
+
+                                                        <Line X1="0" X2="57" Stroke="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TextBlock}}}" Margin="0,2,0,0"/>
+
+                                                        <TextBlock Grid.Row="1" HorizontalAlignment="Center">n*p<Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                                    </StackPanel>
+                                                </InlineUIContainer>
+                                            </TextBlock>
+
+                                            <DataGrid Style="{StaticResource MaterialDesignDataGrid}"
+                                                      Focusable="False"
+                                                      IsHitTestVisible="True"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                        ItemsSource="{Binding THypothesis.Results}"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        CanUserReorderColumns="False"
+                        CanUserResizeColumns="False"
+                        CanUserSortColumns="False"
+                        CanUserResizeRows="False" 
+                        IsReadOnly="True"
+                        Margin="0,24">
+                                                <DataGrid.Columns>
+
+                                                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Number}"
+                                                                Header="№"
+                                                                ElementStyle="{StaticResource dataGridTextBlock}"
+                                                                HeaderStyle="{StaticResource MaterialDesignDataGridColumnHeader}"/>
+
+                                                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Variant}"
+                                                                ElementStyle="{StaticResource dataGridTextBlock}">
+                                                        <DataGridTextColumn.HeaderStyle>
+                                                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+
+                                                                        <Grid>
+                                                                            <Grid.RowDefinitions>
+                                                                                <RowDefinition/>
+                                                                                <RowDefinition/>
+                                                                            </Grid.RowDefinitions>
+
+                                                                            <TextBlock Grid.Row="0">Интервал</TextBlock>
+
+                                                                            <TextBlock Grid.Row="1" HorizontalAlignment="Center"><Run>x</Run><Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                                                        </Grid>
+
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding DataContext.SelectedDistributionType, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Converter={StaticResource distributionTypeToDistributionSeriesTypeConverter}}" Value="{x:Static hypModels:DistributionSeriesType.Сontinuous}">
+                                                                        <Setter Property="Content">
+                                                                            <Setter.Value>
+
+
+                                                                                <Grid>
+                                                                                    <Grid.RowDefinitions>
+                                                                                        <RowDefinition/>
+                                                                                        <RowDefinition/>
+                                                                                    </Grid.RowDefinitions>
+
+                                                                                    <TextBlock Grid.Row="0">Интервал</TextBlock>
+
+                                                                                    <TextBlock Grid.Row="1" VerticalAlignment="Center">x<Run Text="i" BaselineAlignment="Subscript"/> - x<Run Text="i + 1" BaselineAlignment="Subscript"/></TextBlock>
+
+                                                                                </Grid>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </DataGridTextColumn.HeaderStyle>
+                                                    </materialDesign:MaterialDataGridTextColumn>
+
+                                                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding EmpiricalFrequency}"
+                                                                ElementStyle="{StaticResource dataGridTextBlock}">
+                                                        <DataGridTextColumn.HeaderStyle>
+                                                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+
+                                                                        <Grid>
+                                                                            <Grid.RowDefinitions>
+                                                                                <RowDefinition/>
+                                                                                <RowDefinition/>
+                                                                            </Grid.RowDefinitions>
+
+                                                                            <TextBlock Grid.Row="0">Эмп. частоты</TextBlock>
+
+                                                                            <TextBlock Grid.Row="1" HorizontalAlignment="Center"><Run>n</Run><Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                                                        </Grid>
+
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style>
+                                                        </DataGridTextColumn.HeaderStyle>
+                                                    </materialDesign:MaterialDataGridTextColumn>
+
+                                                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Probability, StringFormat={}{0:F2}}"
+                                                                ElementStyle="{StaticResource dataGridTextBlock}">
+                                                        <DataGridTextColumn.HeaderStyle>
+                                                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+
+                                                                        <Grid>
+                                                                            <Grid.RowDefinitions>
+                                                                                <RowDefinition/>
+                                                                                <RowDefinition/>
+                                                                            </Grid.RowDefinitions>
+
+                                                                            <TextBlock Grid.Row="0">Вероятности</TextBlock>
+
+                                                                            <TextBlock Grid.Row="1" HorizontalAlignment="Center">p<Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                                                        </Grid>
+
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style>
+                                                        </DataGridTextColumn.HeaderStyle>
+                                                    </materialDesign:MaterialDataGridTextColumn>
+
+
+                                                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding TheoreticalFrequency, StringFormat={}{0:F2}}"
+                                                                ElementStyle="{StaticResource dataGridTextBlock}">
+                                                        <DataGridTextColumn.HeaderStyle>
+                                                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+
+                                                                        <Grid>
+                                                                            <Grid.RowDefinitions>
+                                                                                <RowDefinition/>
+                                                                                <RowDefinition/>
+                                                                            </Grid.RowDefinitions>
+
+                                                                            <TextBlock Grid.Row="0">Теор. частоты</TextBlock>
+
+                                                                            <TextBlock Grid.Row="1" HorizontalAlignment="Center">n*p<Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                                                        </Grid>
+
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style>
+                                                        </DataGridTextColumn.HeaderStyle>
+                                                    </materialDesign:MaterialDataGridTextColumn>
+
+                                                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Criterion1, StringFormat={}{0:F2}}"
+                                                                ElementStyle="{StaticResource dataGridTextBlock}">
+                                                        <DataGridTextColumn.HeaderStyle>
+                                                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+
+                                                                        <TextBlock>(n<Run Text="i - n*p" BaselineAlignment="Subscript"/><Run Text="i" BaselineAlignment="Subscript"/>)<Run Text="2" BaselineAlignment="Superscript"/></TextBlock>
+
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style>
+                                                        </DataGridTextColumn.HeaderStyle>
+                                                    </materialDesign:MaterialDataGridTextColumn>
+
+                                                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Criterion2, StringFormat={}{0:F2}}"
+                                                                ElementStyle="{StaticResource dataGridTextBlock}">
+                                                        <DataGridTextColumn.HeaderStyle>
+                                                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                                                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+
+                                                                        <StackPanel Orientation="Vertical">
+
+                                                                            <TextBlock x:Name="criterion2TextBlock">
+                                                
+                                                (n<Run Text="i - n*p" BaselineAlignment="Subscript"/><Run Text="i" BaselineAlignment="Subscript"/>)<Run Text="2" BaselineAlignment="Superscript"/>
+
+                                                                            </TextBlock>
+
+                                                                            <Line X1="0" X2="59" Stroke="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridColumnHeader}}}" Margin="0,2,0,0"/>
+
+                                                                            <TextBlock Grid.Row="1" HorizontalAlignment="Center">n*p<Run Text="i" BaselineAlignment="Subscript"/></TextBlock>
+
+                                                                        </StackPanel>
+
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style>
+                                                        </DataGridTextColumn.HeaderStyle>
+                                                    </materialDesign:MaterialDataGridTextColumn>
+
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+
+                                            <TextBlock Margin="0,0,0,8"
+                                                       Style="{StaticResource MaterialDesignBody1TextBlock}">
+                                                Определим границу критической области.
+                                            </TextBlock>
+                                            
+                                            <TextBlock TextWrapping="Wrap">
+                                                Так как статистика Пирсона измеряет разницу между эмпирическим и теоретическим распределениями, то чем больше ее наблюдаемое значение K<Run Text="набл." BaselineAlignment="Subscript"/>, тем сильнее довод против основной гипотезы.
+                                                Поэтому критическая область для этой статистики всегда правосторонняя: [K<Run Text="крит." BaselineAlignment="Subscript"/> ; +∞).
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,16,0,16" 
+                                                       HorizontalAlignment="Center">
+                                                K<Run Text="крит." BaselineAlignment="Subscript"/> = <Run Text="{Binding THypothesis.CriticalValue, Mode=OneWay, StringFormat={}{0:F2}}"/>, K<Run Text="набл." BaselineAlignment="Subscript"/> = <Run Text="{Binding THypothesis.EmpiricalValue, Mode=OneWay, StringFormat={}{0:F2}}"/>
+                                            </TextBlock>
+
+                                            <TextBlock TextWrapping="Wrap">
+                                                Наблюдаемое значение статистики Пирсона 
+                                                <Run>
+                                                    <Run.Style>
+                                                        <Style TargetType="{x:Type Run}">
+                                                            <Setter Property="Text" Value="попадает"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding THypothesis.IsValid}" Value="true">
+                                                                    <Setter Property="Text" Value="не попадает"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Run.Style>
+                                                </Run> 
+                                                в критическую область: 
+                                                K<Run Text="набл." BaselineAlignment="Subscript"/>
+                                                <Run>
+                                                    <Run.Style>
+                                                        <Style TargetType="{x:Type Run}">
+                                                            <Setter Property="Text" Value=">"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding THypothesis.IsValid}" Value="true">
+                                                                    <Setter Property="Text" Value="&lt;"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Run.Style>
+                                                </Run> 
+                                                K<Run Text="крит." BaselineAlignment="Subscript"/>, поэтому 
+                                                <Run>
+                                                    <Run.Style>
+                                                        <Style TargetType="{x:Type Run}">
+                                                            <Setter Property="Text" Value="есть основания"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding THypothesis.IsValid}" Value="true">
+                                                                    <Setter Property="Text" Value="нет оснований"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Run.Style>
+                                                </Run> 
+                                                отвергать основную гипотезу.
+                                            </TextBlock>
+
+                                            <ContentControl Margin="0 8 0 0">
+                                                <ContentControl.Style>
+                                                    <Style TargetType="{x:Type ContentControl}">
+                                                        <Setter Property="Content">
+                                                            <Setter.Value>
+
+                                                                <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                                           TextWrapping="Wrap">
+                                                                    Справедливо предположение о том, что данные выборки имеют <Run Text="{Binding SelectedDistributionType, Converter={StaticResource enumToDescriptionConverter}}"/> распределение.
+                                                                </TextBlock>
+
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding THypothesis.IsValid}" Value="false">
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+
+                                                                        <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                                                   TextWrapping="Wrap">
+                                                                            Эмпирические и теоретические частоты различаются значимо.
+                                                                        </TextBlock>
+                                                                        
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ContentControl.Style>
+                                                
+                                            </ContentControl>
+
+                                        </StackPanel>
+
+                                    </materialDesign:ColorZone>
+
+                                    <materialDesign:ColorZone Mode="Light"
+                                                            Padding="24"
+                                                            BorderThickness="0 0 0 1"
+                                                            BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}">
+
+                                        <StackPanel Orientation="Vertical">
+
+                                            <TextBlock Text="Графическое представление статистики"
+                                                    Style="{StaticResource MaterialDesignTitleTextBlock}"/>
+
+                                            <TextBlock Opacity=".5">
+                                                Полигон эмпирических частот и вероятности распределения.
+                                            </TextBlock>
+
+                                            <lvc:CartesianChart Series="{Binding THypothesis.Series}" 
+                                                            LegendLocation="Top"
+                                                            Margin="0 24 0 24"
+                                                            HorizontalAlignment="Center"
+                                                            MinWidth="500"
+                                                            MinHeight="300">
+                                                <lvc:CartesianChart.AxisY>
+                                                    <lvc:Axis MinValue="0"/>
+                                                </lvc:CartesianChart.AxisY>
+                                                <lvc:CartesianChart.AxisX>
+                                                    <lvc:Axis Name="xAxis" ShowLabels="True" Labels="{Binding THypothesis.Results, Converter={StaticResource tHypothesisResultToVariantConverter}}"/>
+                                                </lvc:CartesianChart.AxisX>
+                                            </lvc:CartesianChart>
+
+                                        </StackPanel>
+
+                                    </materialDesign:ColorZone>
+
+                                </StackPanel>
+
+                            </ScrollViewer>
+
+                        </materialDesign:TransitioningContent>
+
+                    </Grid>
+
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsBusy}" Value="true"/>
+                        <Condition Binding="{Binding IsResult}" Value="false"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Content">
+                        <Setter.Value>
+
+                            <materialDesign:TransitioningContent OpeningEffectsOffset="{materialDesign:IndexedItemOffsetMultiplier 0:0:5}"
+                                                                 VerticalAlignment="Center"
+                                                                 HorizontalAlignment="Center">
+                                <materialDesign:TransitioningContent.OpeningEffects>
+                                    <materialDesign:TransitionEffect Kind="ExpandIn" />
+                                    <materialDesign:TransitionEffect Kind="FadeIn"/>
+                                </materialDesign:TransitioningContent.OpeningEffects>
+
+                                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                                             Value="0"
+                                             IsIndeterminate="True"/>
+
+                            </materialDesign:TransitioningContent>
+
+                        </Setter.Value>
+                    </Setter>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsBusy}" Value="false"/>
+                        <Condition Binding="{Binding IsResult}" Value="false"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Content" Value="{x:Null}"/>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+        
         <DataTemplate DataType="{x:Type variation:DiscreteData}">
-            <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
-                    BorderThickness="0 0 1 0">
 
-                <DataGrid Style="{StaticResource inputDataGrid}">
-                    <DataGrid.Columns>
+            <DataGrid Style="{StaticResource inputDataGrid}">
+                <DataGrid.Columns>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
-                                                                   Header="X"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
-                                                                   HeaderStyle="{StaticResource dataGridColumnHeader}"/>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
+                                                               Header="X"                                                               
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                                                               HeaderStyle="{StaticResource dataGridColumnHeader}"/>
 
-                    </DataGrid.Columns>
-                </DataGrid>
+                </DataGrid.Columns>
+            </DataGrid>
 
-            </Border>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type variation:DiscreteGroupedData}">
-            <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
-                    BorderThickness="0 0 1 0">
 
-                <DataGrid Style="{StaticResource inputDataGrid}">
-                    <DataGrid.Columns>
+            <DataGrid Style="{StaticResource inputDataGrid}">
+                <DataGrid.Columns>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Variant}"
-                                                                   Header="X"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
-                                                                   HeaderStyle="{StaticResource dataGridColumnHeader}"/>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Variant}"
+                                                               Header="X"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                                                               HeaderStyle="{StaticResource dataGridColumnHeader}"/>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
-                                                                   Header="F"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
-                                                                   HeaderStyle="{StaticResource dataGridColumnHeader}"/>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
+                                                               Header="F"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                                                               HeaderStyle="{StaticResource dataGridColumnHeader}"/>
 
-                    </DataGrid.Columns>
-                </DataGrid>
+                </DataGrid.Columns>
+            </DataGrid>
 
-            </Border>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type variation:СontinuousData}">
-            <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
-                    BorderThickness="0 0 1 0">
 
-                <DataGrid Style="{StaticResource inputDataGrid}">
-                    <DataGrid.Columns>
+            <DataGrid Style="{StaticResource inputDataGrid}">
+                <DataGrid.Columns>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
-                                                                   Header="X"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
-                                                                   HeaderStyle="{StaticResource dataGridColumnHeader}"/>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
+                                                               Header="X"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                                                               HeaderStyle="{StaticResource dataGridColumnHeader}"/>
 
-                    </DataGrid.Columns>
-                </DataGrid>
+                </DataGrid.Columns>
+            </DataGrid>
 
-            </Border>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type variation:СontinuousGroupedData}">
-            <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
-                    BorderThickness="0 0 1 0">
 
-                <DataGrid Style="{StaticResource inputDataGrid}">
-                    <DataGrid.Columns>
+            <DataGrid Style="{StaticResource inputDataGrid}">
+                <DataGrid.Columns>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Variant, Converter={StaticResource intervalStringConverter}, NotifyOnValidationError=True, ValidatesOnDataErrors=True}"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}">
-                            <DataGridTextColumn.HeaderStyle>
-                                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource dataGridColumnHeader}">
-                                    <Setter Property="Content">
-                                        <Setter.Value>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Variant, Converter={StaticResource intervalStringConverter}, NotifyOnValidationError=True, ValidatesOnDataErrors=True}"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource dataGridColumnHeader}">
+                                <Setter Property="Content">
+                                    <Setter.Value>
 
-                                            <TextBlock Cursor="Arrow" VerticalAlignment="Center">X<Run Text="i" BaselineAlignment="Subscript"/> - X<Run Text="i + 1" BaselineAlignment="Subscript"/></TextBlock>
+                                        <TextBlock Cursor="Arrow" VerticalAlignment="Center">X<Run Text="i" BaselineAlignment="Subscript"/> - X<Run Text="i + 1" BaselineAlignment="Subscript"/></TextBlock>
 
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </DataGridTextColumn.HeaderStyle>
-                        </materialDesign:MaterialDataGridTextColumn>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                    </materialDesign:MaterialDataGridTextColumn>
 
-                        <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
-                                                                   Header="F"
-                                                                   ElementStyle="{StaticResource dataGridTextBlock}"
-                                                                   EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
-                                                                   HeaderStyle="{StaticResource dataGridColumnHeader}"/>
+                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Value}"
+                                                               Header="F"
+                                                               ElementStyle="{StaticResource dataGridTextBlock}"
+                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                                                               HeaderStyle="{StaticResource dataGridColumnHeader}"/>
 
-                    </DataGrid.Columns>
-                </DataGrid>
+                </DataGrid.Columns>
+            </DataGrid>
 
-            </Border>
         </DataTemplate>
 
     </UserControl.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <materialDesign:TransitioningContent x:Name="PART_InputDataContainer"
-                                             Grid.Row="0">
-            <materialDesign:TransitioningContent.OpeningEffects>
-                <materialDesign:TransitionEffect Kind="SlideInFromLeft"/>
-                <materialDesign:TransitionEffect Kind="FadeIn"/>
-            </materialDesign:TransitioningContent.OpeningEffects>
-            <materialDesign:TransitioningContent.Resources>
-                
-            </materialDesign:TransitioningContent.Resources>
+        <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
+                BorderThickness="0 0 1 0"
+                Style="{StaticResource leftInputBorderStyle}"
+                x:Name="PART_inputData">
 
-            <ContentControl Content="{Binding VariationData}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
 
-        </materialDesign:TransitioningContent>
+                <materialDesign:PopupBox Grid.Row="0"
+                                         Margin="12 12 12 0"
+                                         Panel.ZIndex="1"
+                                         HorizontalAlignment="Right"
+                                         PlacementMode="BottomAndAlignLeftEdges" 
+                                         StaysOpen="False">
+                    <materialDesign:PopupBox.ToggleContent>
+
+                        <materialDesign:PackIcon Kind="DotsHorizontal"
+                                                 Opacity="0.5"/>
+
+                    </materialDesign:PopupBox.ToggleContent>
+
+                    <ItemsControl ItemsSource="{Binding CommandItems}"
+                                  VirtualizingStackPanel.IsVirtualizing="True"
+                                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                  ScrollViewer.CanContentScroll="True">
+                        <ItemsControl.ItemTemplate>
+
+                            <DataTemplate DataType="{x:Type models:ICommandItem}">
+
+                                <Button Height="40"
+                                        Padding="12 0 12 0"
+                                        HorizontalContentAlignment="Left"
+                                        ToolTip="{Binding ToolTip}" 
+                                        ToolTipService.InitialShowDelay="0" 
+                                        Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                                        Style="{DynamicResource MaterialDesignFlatButton}"
+                                        Command="{Binding Command}">
+
+                                    <StackPanel Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <materialDesign:PackIcon Kind="{Binding IconKind}" />
+
+                                        <TextBlock Margin="12 0 0 0"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="14"
+                                                   Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                                   Text="{Binding Title, Mode=OneWay}"/>
+
+                                    </StackPanel>
+
+                                </Button>
+
+                            </DataTemplate>
+
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                </materialDesign:PopupBox>
+
+                <ContentControl Grid.Row="1" 
+                                Content="{Binding VariationData}"/>
+
+            </Grid>
+
+        </Border>
 
         <Grid Grid.Column="1">
-            <ComboBox
-                  materialDesign:HintAssist.Hint="Тип ряда"
-                  MinWidth="72"
-            HorizontalAlignment="Center"
-                  Margin="0 100 0 0"
-                  VerticalAlignment="Top"
-            SelectedItem="{Binding SelectedDistributionSeriesInputType}"
-                  ItemsSource="{Binding DistributionSeriesInputTypes}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-                <ComboBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ComboBox.ItemsPanel>
-            </ComboBox>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
-            <ComboBox x:Name="typeSeries"
-                  materialDesign:HintAssist.Hint="Тип распределения"
-                  MinWidth="72"
-            HorizontalAlignment="Center"
-                  
-                  Margin="0 150 0 0"
-                  VerticalAlignment="Top"
-            SelectedItem="{Binding SelectedDistributionType}"
-                  ItemsSource="{Binding DistributionTypes}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-                <ComboBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ComboBox.ItemsPanel>
-            </ComboBox>
+            <StackPanel x:Name="PART_inputParams" 
+                        Grid.RowSpan="2"                                              
+                        Orientation="Vertical" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center">
+
+                <WrapPanel HorizontalAlignment="Center"
+                           Margin="12 48 12 24">
+
+                    <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Тип распределения"
+                              Width="200"
+                              Margin="12 0 12 0"
+                              VerticalAlignment="Top"
+                              HorizontalAlignment="Left"
+                              SelectedItem="{Binding SelectedDistributionType}"
+                              ItemsSource="{Binding DistributionTypes}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+
+                    <materialDesign:TransitioningContent Style="{StaticResource inputFieldsTransitioningContentStyle}"
+                                                         Visibility="{Binding SelectedDistributionType, Converter={StaticResource NullableToVisibilityConverter}}">
+                        <materialDesign:TransitioningContent.OpeningEffects>
+                            <materialDesign:TransitionEffect Kind="SlideInFromRight"/>
+                            <materialDesign:TransitionEffect Kind="FadeIn"/>
+                        </materialDesign:TransitioningContent.OpeningEffects>
+
+                        <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                  materialDesign:HintAssist.Hint="Уровень значимости"
+                                  Width="200"
+                                  Margin="12 0 12 0"
+                                  VerticalAlignment="Top"
+                                  HorizontalAlignment="Left"
+                                  SelectedItem="{Binding SelectedSignificanceLevel}"
+                                  ItemsSource="{Binding SignificanceLevels}">
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+
+                    </materialDesign:TransitioningContent>
+
+                    <materialDesign:TransitioningContent Style="{StaticResource inputFieldsTransitioningContentStyle}"
+                                                         Visibility="{Binding SelectedSignificanceLevel, Converter={StaticResource NullableToVisibilityConverter}}">
+                        <materialDesign:TransitioningContent.OpeningEffects>
+                            <materialDesign:TransitionEffect Kind="SlideInFromRight"/>
+                            <materialDesign:TransitionEffect Kind="FadeIn"/>
+                        </materialDesign:TransitioningContent.OpeningEffects>
+
+                        <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                  materialDesign:HintAssist.Hint="Тип ряда"
+                                  Width="200"
+                                  Margin="12 0 12 0"
+                                  VerticalAlignment="Top"
+                                  HorizontalAlignment="Left"
+                                  SelectedItem="{Binding SelectedDistributionSeriesInputType}"
+                                  ItemsSource="{Binding DistributionSeriesInputTypes}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+
+                    </materialDesign:TransitioningContent>
+
+                </WrapPanel>
+
+                <Button Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="12"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+                        Command="{Binding CalculateVariationDataCommand}">
+
+                    <materialDesign:PackIcon Kind="ChevronUp"/>
+
+                </Button>
+                
+            </StackPanel>
+
+            <ContentControl Grid.Row="1"
+                            x:Name="PART_resultContentControl"
+                            Style="{StaticResource resultContentControlStyle}"/>
+
         </Grid>
 
     </Grid>

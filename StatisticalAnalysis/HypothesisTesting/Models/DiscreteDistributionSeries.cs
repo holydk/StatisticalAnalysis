@@ -6,15 +6,15 @@ namespace StatisticalAnalysis.HypothesisTesting.Models
 {
     public class DiscreteDistributionSeries : DistributionSeries
     {
-        public DiscreteDistributionSeries(IUnivariateDistribution univariateDistribution, ICollection<IVariationPair<int>> discretePairs)
+        public DiscreteDistributionSeries(IUnivariateDistribution univariateDistribution, ICollection<IVariationPair<Variant<int>>> discretePairs)
             : base(univariateDistribution, (ICollection<IVariationPair<object>>)discretePairs)
         { }
 
         public override double CumulativeDistribution(IVariationPair<object> variationPair)
         {
-            if (variationPair is IVariationPair<double> pair)
+            if (variationPair is IVariationPair<Variant<int>> pair)
             {
-                return UnivariateDistribution.CumulativeDistribution(pair.Variant);
+                return UnivariateDistribution.CumulativeDistribution(pair.Variant.Value);
             }
             else
             {

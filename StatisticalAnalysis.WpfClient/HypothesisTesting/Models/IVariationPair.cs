@@ -1,4 +1,4 @@
-﻿namespace StatisticalAnalysis.HypothesisTesting.Models
+﻿namespace StatisticalAnalysis.WpfClient.HypothesisTesting.Models
 {
     public interface IVariationPair<out TVariant>
         where TVariant : class

@@ -4,6 +4,12 @@
     {
         public string Title { get; }
 
+        public bool IsBusy
+        {
+            get => Get(() => IsBusy);
+            set => Set(() => IsBusy, value);
+        }
+
         public PageViewModel(string title)
         {
             Title = title;

@@ -1,11 +1,8 @@
 ﻿using MathNet.Numerics.Distributions;
-using StatisticalAnalysis.Helpers;
+using MathNet.Numerics.Statistics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ConsoleAppTest
 {
@@ -13,65 +10,63 @@ namespace ConsoleAppTest
     {
         static void Main(string[] args)
         {
-            PrintMessage();
+            // Binomial
+            var p = 0.152;
+            var n = 5;
+            var x = 0;
+            var bCdf = Binomial.CDF(p, n, x);
+            var bPmf = Binomial.PMF(p, n, x);
+            var bPmfLn = Binomial.PMFLn(p, n, x);
 
-            var st = new StudentT(0, 1, 20);
-            Console.WriteLine(2 * (1 - st.CumulativeDistribution(3.852)));
-            Console.WriteLine(2 * (1 - StudentT.CDF(0, 1, 20, 3.852)));
-            Console.WriteLine(Student(3.852, 20));
-            Console.WriteLine(Gauss(0.0));
+            var b = new Binomial(p, n);
+            var _bCdf = b.CumulativeDistribution(x);
+            var _bPmf = b.Probability(x);
+            var _bPmfLn = b.ProbabilityLn(x);
 
-            var g1 = gamma(1.5);
-            var g2 = Gamma(1.5);
+            // Normal
+            var mean = 1012.5;
+            var stdDev = 24.8069;
+            var x1 = 1000;
+            var x2 = 1025;
+            var nCdf = Normal.CDF(mean, stdDev, x2) - Normal.CDF(mean, stdDev, x1);
+            var nPdf = Normal.PDF(mean, stdDev, x2) - Normal.PDF(mean, stdDev, x1);
+            var nPdfLn = Normal.PDFLn(mean, stdDev, x2) - Normal.PDFLn(mean, stdDev, x1);
 
-            Console.WriteLine(g1);
-            Console.WriteLine(g2);
+            var resN = new List<double>();
+
+            for (int i = 950; i < 1075; i++)
+            {
+                //resN.Add(Normal.CDF(mean, stdDev, 1075) - Normal.CDF(mean, stdDev, i));
+                resN.Add(Normal.CDF(mean, stdDev, i));
+            }
+
+            var _n = new Normal(mean, stdDev);
+            var _nCdf = b.CumulativeDistribution(x2) - b.CumulativeDistribution(x1);
+            var _nPdf = b.Probability(x2) - b.Probability(x1);
+            var _nPdfLn = b.ProbabilityLn(x2) - b.ProbabilityLn(x1);
+            var nSamples = new double[100];
+            _n.Samples(nSamples);
+
+            // Discrete Uniform
+            var sqrtThree = Math.Sqrt(3);
+            var lower = (int) Math.Round(mean - sqrtThree * stdDev);
+            var upper = (int) Math.Round(mean + sqrtThree * stdDev);
+            var x3 = 962.5;
+            var x4 = 6;
+            var uCdf = DiscreteUniform.CDF(lower, upper, x3);
+            var uPmf = DiscreteUniform.PMF(lower, upper, (int)Math.Round(x3));
+
+            var u = new DiscreteUniform(lower, upper);
+            var _uCdf = u.CumulativeDistribution(x3);
+            var _uPmf = u.Probability((int)Math.Round(x3));
+            var uSamples = new int[100];
+            u.Samples(uSamples);
+
+            var h = new Histogram(nSamples, 5);
             
-            var normal = new Normal(1012.5, 24.8069);
-            //normal.Samples(new double[]
-            //{
-            //    -1.02,
-            //    0.98,
-            //    1.58,
-            //    0.93,
-            //    0.2,
-            //    0.29,
-            //    0.79,
-            //    0.12,
-            //    1.04,
-            //    1.3
-            //});
+            var series = _n.Samples();
 
-            var nCdf = Normal.CDF(1012.5, 24.8069, 1050) - Normal.CDF(1012.5, 24.8069, 1025);
-
-
-            var st1 = new StudentT(0, 1, 20);
-            st1.Samples(
-                new double[]
-                {
-                    321,
-                    300,
-                    350,
-                    360,
-                    400,
-                    250,
-                    281,
-                    278,
-                    330,
-                    374,
-                    280,
-                    421,
-                    245,
-                    352,
-                    312,
-                    279,
-                    233,
-                    310,
-                    265,
-                    275
-                });
-
-            Regex _regexBack = new Regex(@"(?:(?<Lower>[\d]+)? *-? *(?:(?<Upper>[\d]+)))");
+                     Regex _regexBack = new Regex(@"(?:(?<Lower>[\d]+)? *-? *(?:(?<Upper>[\d]+)))");
             var test0 = "66";
 
             var select = test0;
@@ -84,7 +79,7 @@ namespace ConsoleAppTest
                 }
             }
 
-            Console.WriteLine(StatisticalAnalysisProvider.GetNumberOfIntervals(70));
+            
 
             Console.ReadKey();
         }
