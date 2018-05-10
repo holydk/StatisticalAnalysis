@@ -30,12 +30,12 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
 
         public async Task FromFileAsync(string fileName)
         {
-            var fileExt = FileHelper.GetFileExtension(fileName);
+            var fileExt = CommonHelpers.GetFileExtension(fileName);
 
             if (!fileExt.HasValue || fileExt != FileExtension.Csv)
                 throw new NotSupportedException("Данный тип файла не поддерживается.");
 
-            var data = await FileHelper.ReadCsvAsync(fileName, ';');
+            var data = await CommonHelpers.ReadCsvAsync(fileName, ';');
 
             FixDefaultErrors(data);
 

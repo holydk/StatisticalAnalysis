@@ -2,6 +2,12 @@
 {
     public enum FileExtension
     {
-        Csv
+        Csv,
+
+        Docx,
+
+        Xlsx,
+
+        Pdf
     }
 }

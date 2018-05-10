@@ -31,7 +31,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             Links = new ILink[]
             {
                 new Link("GitHub", "https://github.com/holydk/StatisticalAnalysis", PackIconKind.GithubCircle, "Исходный код")
-            };
+            };            
         }
     }
 }

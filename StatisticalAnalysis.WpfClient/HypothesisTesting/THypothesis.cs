@@ -38,6 +38,7 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
                 throw new ArgumentOutOfRangeException(nameof(significanceLevel));
 
             SignificanceLevel = significanceLevel;
+
             _results = new ObservableCollection<THypothesisResult>();
             _series = new SeriesCollection();
         }
@@ -59,7 +60,6 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
 
             _empiricalValue = _results.Sum(r => r.Criterion2);
             _criticalValue = ChiSquared.InvCDF(varPairs.Count - _r, 1 - SignificanceLevel);
-
             _isValid = _empiricalValue > _criticalValue ? false : true;
 
             BuildSeries(sumFrequency);
@@ -68,7 +68,8 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
         private void BuildSeries(double sumFrequency)
         {
             var p = _results.Select(r => r.Probability);
-            var empiricalF = _results.Select(r => (r.EmpiricalFrequency / (r.Probability * sumFrequency)) * r.Probability);
+            var empiricalF = _results.Select(
+                r => (r.EmpiricalFrequency / (r.Probability * sumFrequency)) * r.Probability);
 
             _series.AddRange(new object[]
             {

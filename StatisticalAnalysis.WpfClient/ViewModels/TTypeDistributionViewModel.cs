@@ -21,7 +21,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
 
         public IEnumerable<ICommandItem> CommandItems { get; }
 
-        public IEnumerable<ICommandItem> ResultCommandItems { get; }
+        public ICollection<ICommandItem> ResultCommandItems { get; }
 
         public IEnumerable<double> SignificanceLevels { get; }
 
@@ -93,10 +93,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
                 new CommandItem("Очистить", MaterialDesignThemes.Wpf.PackIconKind.Delete, new RelayCommand((sender) => VariationData?.ClearData()))
             };
 
-            ResultCommandItems = new ICommandItem[]
-            {
-                new CommandItem("Сохранить", MaterialDesignThemes.Wpf.PackIconKind.ContentSave, SaveResultCommand)
-            };
+            ResultCommandItems = new List<ICommandItem>();
         }
 
         public ICommand ReadDataFromFileCommand
@@ -134,6 +131,10 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
                         {
                             // Invalid Convert
                             MessageBox.Show(invOpEx.Message);
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Произошла непредвиденная ошибка.");
                         }
                     }
                 }
@@ -179,14 +180,6 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
 
                 IsBusy = false;
                 IsResult = false;
-            }));
-        }
-
-        public ICommand SaveResultCommand
-        {
-            get => Get(() => SaveResultCommand, new RelayCommand((sender) =>
-            {
-                
             }));
         }
 
