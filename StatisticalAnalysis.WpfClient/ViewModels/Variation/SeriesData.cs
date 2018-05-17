@@ -88,6 +88,6 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
 
         protected abstract TDatum Parse(string item);
 
-        public abstract ICollection<IVariationPair<object>> ToVariationPairs();
+        public abstract IVariationPair<object>[] ToVariationPairs();
     }
 }

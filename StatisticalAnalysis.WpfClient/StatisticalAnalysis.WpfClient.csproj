@@ -111,6 +111,7 @@
     <Compile Include="Helpers\IntervalStringConverter.cs" />
     <Compile Include="Helpers\Statistics.cs" />
     <Compile Include="Helpers\THypothesisResultToVariantConverter.cs" />
+    <Compile Include="HypothesisTesting\ITHypothesis.cs" />
     <Compile Include="HypothesisTesting\Models\DistributionSeriesType.cs" />
     <Compile Include="HypothesisTesting\Models\DistributionType.cs" />
     <Compile Include="HypothesisTesting\Models\Interval.cs" />
@@ -118,7 +119,7 @@
     <Compile Include="HypothesisTesting\Models\TypeOfDistributionSeriesAttribute.cs" />
     <Compile Include="HypothesisTesting\Models\Variant.cs" />
     <Compile Include="HypothesisTesting\Models\VariationPair.cs" />
-    <Compile Include="HypothesisTesting\TDiscreteUniform.cs" />
+    <Compile Include="HypothesisTesting\TContinuousUniform.cs" />
     <Compile Include="HypothesisTesting\TNormal.cs" />
     <Compile Include="Models\CommandItem.cs" />
     <Compile Include="HypothesisTesting\Models\DistributionSeriesInputType.cs" />

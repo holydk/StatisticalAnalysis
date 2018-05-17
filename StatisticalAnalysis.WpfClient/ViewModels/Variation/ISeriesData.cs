@@ -6,7 +6,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
 {
     public interface ISeriesData : IConvertFromFile
     {
-        ICollection<IVariationPair<object>> ToVariationPairs();
+        IVariationPair<object>[] ToVariationPairs();
 
         void ClearData();
     }

@@ -33,7 +33,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
             }
         }
 
-        public override ICollection<IVariationPair<object>> ToVariationPairs()
+        public override IVariationPair<object>[] ToVariationPairs()
         {
             if (Data == null || Data.Count == 0) return null;
 

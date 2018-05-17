@@ -49,22 +49,14 @@ namespace ConsoleAppTest
 
             // Discrete Uniform
             var sqrtThree = Math.Sqrt(3);
-            var lower = (int) Math.Round(mean - sqrtThree * stdDev);
-            var upper = (int) Math.Round(mean + sqrtThree * stdDev);
-            var x3 = 962.5;
-            var x4 = 6;
-            var uCdf = DiscreteUniform.CDF(lower, upper, x3);
-            var uPmf = DiscreteUniform.PMF(lower, upper, (int)Math.Round(x3));
-
+            var _mean = 2;
+            var _stdDev = 1.47;
+            var lower = (int) Math.Round(_mean - sqrtThree * _stdDev);
+            var upper = (int) Math.Round(_mean + sqrtThree * _stdDev);
             var u = new DiscreteUniform(lower, upper);
-            var _uCdf = u.CumulativeDistribution(x3);
-            var _uPmf = u.Probability((int)Math.Round(x3));
-            var uSamples = new int[100];
-            u.Samples(uSamples);
+            var _p = u.Probability(7);
 
             var h = new Histogram(nSamples, 5);
-            
-            var series = _n.Samples();
 
                      Regex _regexBack = new Regex(@"(?:(?<Lower>[\d]+)? *-? *(?:(?<Upper>[\d]+)))");
             var test0 = "66";

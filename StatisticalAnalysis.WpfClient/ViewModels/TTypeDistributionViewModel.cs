@@ -57,7 +57,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             set => Set(() => VariationData, value);
         }
 
-        public THypothesis THypothesis
+        public ITHypothesis THypothesis
         {
             get => Get(() => THypothesis);
             set => Set(() => THypothesis, value);
@@ -191,23 +191,23 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             {
                 case DistributionType.Binomial:
 
-                    var discretePairs = (ICollection<IVariationPair<Variant<int>>>)varPairs;
+                    var discretePairs = (IVariationPair<Variant<int>>[])varPairs;
 
                     THypothesis = new TBinomial(discretePairs, SelectedSignificanceLevel.Value);
 
                     break;
 
-                case DistributionType.DiscreteUniform:
+                case DistributionType.ContinuousUniform:
 
-                    discretePairs = (ICollection<IVariationPair<Variant<int>>>)varPairs;
+                    discretePairs = (IVariationPair<Variant<int>>[])varPairs;
 
-                    THypothesis = new TDiscreteUniform(discretePairs, SelectedSignificanceLevel.Value);
+                    THypothesis = new TContinuousUniform(discretePairs, SelectedSignificanceLevel.Value);
 
                     break;
 
                 case DistributionType.Normal:
 
-                    var intervals = (ICollection<IVariationPair<Variant<Interval>>>)varPairs;
+                    var intervals = (IVariationPair<Variant<Interval>>[])varPairs;
 
                     THypothesis = new TNormal(intervals, SelectedSignificanceLevel.Value);
 
