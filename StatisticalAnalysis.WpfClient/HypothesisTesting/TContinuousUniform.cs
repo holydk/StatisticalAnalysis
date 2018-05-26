@@ -1,7 +1,6 @@
 ﻿using MathNet.Numerics.Distributions;
 using StatisticalAnalysis.WpfClient.HypothesisTesting.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace StatisticalAnalysis.WpfClient.HypothesisTesting

@@ -63,6 +63,7 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
                 else
                     return r.Criterion2;
             });
+
             _criticalValue = ChiSquared.InvCDF(_variationPairs.Length - _r - 1, 1 - SignificanceLevel);
             _isValid = _empiricalValue > _criticalValue ? false : true;
 

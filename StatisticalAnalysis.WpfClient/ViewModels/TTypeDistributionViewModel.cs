@@ -94,6 +94,12 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             };
 
             ResultCommandItems = new List<ICommandItem>();
+
+            _informationItems = new IInformationItem[]
+            {
+                new InformationItem("Как ввести данные", "Вы можете ввести данные двумя способами: самостоятельно или загрузить из файла. Поддерживаемые форматы: *.csv. При загрузке данных учитывается тип вариационного ряда."),
+                new InformationItem("Хотите сохранить результат?", "Сохранить вычисленные данные, включая график, вы можете в форматы: *.docx, *.xlsx, *.pdf.")
+            };
         }
 
         public ICommand ReadDataFromFileCommand
@@ -163,10 +169,12 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
                 SetTHypothesis(varPairs);
 
                 if (THypothesis != null)
-                {
-                    IsBusy = false;
+                {                   
                     IsResult = true;
                 }
+
+                IsBusy = false;
+
             }, () => !IsBusy && VariationData != null && SelectedDistributionType != null && SelectedDistributionSeriesInputType != null && SelectedSignificanceLevel != null));
         }
 

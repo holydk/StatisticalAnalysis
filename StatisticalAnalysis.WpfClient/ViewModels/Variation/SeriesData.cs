@@ -68,8 +68,6 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
             return parsedData;         
         }
 
-        protected virtual void FixParsedData(ICollection<TDatum> data) { }
-
         private void FixDefaultErrors(string[] data)
         {
             for (int i = 0; i < data.Length; i++)
@@ -81,6 +79,30 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
                 // Rus
                 if (data[i].Contains('о'))
                     data[i] = data[i].Replace('о', '0');
+            }
+        }
+
+        protected virtual void FixParsedData(ICollection<TDatum> data) { }
+
+        protected virtual void FixVariationPairs(ICollection<IVariationPair<object>> variationPairs)
+        {
+            if (variationPairs.Any(pair => pair.Frequency < 5))
+            {
+                var pairs = variationPairs.ToArray();
+
+                for (int i = 0; i < pairs.Length; i++)
+                {
+                    if (pairs[i].Frequency >= 5) continue;
+
+                    if (i == 0)
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+                }
             }
         }
 

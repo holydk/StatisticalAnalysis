@@ -40,7 +40,7 @@ namespace StatisticalAnalysis.WpfClient.Views
 
             InitializeComponent();
 
-            if (ViewModel.ResultCommandItems != null && !ViewModel.ResultCommandItems.Any(i => i.Title != "Сохранить"))
+            if (ViewModel.ResultCommandItems != null && !ViewModel.ResultCommandItems.Any(i => i.Title == "Сохранить"))
             {
                 ViewModel.ResultCommandItems.Add(new CommandItem(
                     "Сохранить",
