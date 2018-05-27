@@ -13,5 +13,7 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
         bool? IsValid { get; }
 
         ReadOnlyCollection<THypothesisResult> Results { get; }
+
+        void Execute();
     }
 }

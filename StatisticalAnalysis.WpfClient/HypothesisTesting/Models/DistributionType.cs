@@ -13,7 +13,7 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting.Models
         Binomial,
 
         [Description("Непрерывное равномерное")]
-        [TypeOfDistributionSeries(DistributionSeriesType.Discrete)]
+        [TypeOfDistributionSeries(DistributionSeriesType.Сontinuous)]
         ContinuousUniform
     }
 }

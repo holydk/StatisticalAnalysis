@@ -9,8 +9,8 @@ using System.Linq;
 
 namespace StatisticalAnalysis.WpfClient.HypothesisTesting
 {
-    public abstract class THypothesis<TVariant, TDistribution> : ITHypothesis
-        where TVariant : class 
+    public abstract class THypothesis<TPair, TDistribution> : ITHypothesis
+        where TPair : IVariationPair
         where TDistribution : class, IUnivariateDistribution
     {
         public double SignificanceLevel { get; }
@@ -32,29 +32,29 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
         private bool? _isValid = null;
         public bool? IsValid => _isValid;
 
-        protected IVariationPair<TVariant>[] _variationPairs;
+        protected TPair[] _pairs;
 
         protected abstract int _r { get; }
 
-        public THypothesis(IVariationPair<TVariant>[] variationPairs, double significanceLevel)
+        public THypothesis(TPair[] pairs, double significanceLevel)
         {
             if (significanceLevel == 0 || significanceLevel >= 1)
                 throw new ArgumentOutOfRangeException(nameof(significanceLevel));
 
             SignificanceLevel = significanceLevel;
 
-            _variationPairs = variationPairs ?? throw new ArgumentNullException(nameof(variationPairs));
+            _pairs = pairs ?? throw new ArgumentNullException(nameof(pairs));
             _results = new List<THypothesisResult>();
             _series = new SeriesCollection();
         }
 
-        protected abstract double Probability(TVariant variant);
+        protected abstract double Probability(TPair pair);
 
-        protected virtual void Execute()
+        public void Execute()
         {
-            var sumFrequency = _variationPairs.Sum(p => p.Frequency);
+            var sumFrequency = _pairs.Sum(p => p.Frequency);
 
-            CalculateVariationData(sumFrequency);
+            CalculateStatistics(sumFrequency);
 
             _empiricalValue = _results.Sum(r => 
             {
@@ -64,31 +64,15 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
                     return r.Criterion2;
             });
 
-            _criticalValue = ChiSquared.InvCDF(_variationPairs.Length - _r - 1, 1 - SignificanceLevel);
+            _criticalValue = ChiSquared.InvCDF(_results.Count - _r - 1, 1 - SignificanceLevel);
             _isValid = _empiricalValue > _criticalValue ? false : true;
 
             BuildSeries(sumFrequency);
         }
 
-        protected virtual void CalculateVariationData(int sumFrequency)
-        {
-            double p;
-            double tFrequency;
-            double c1;
-            double c2;
+        protected abstract void CalculateStatistics(int sumFrequency);
 
-            foreach (var pair in _variationPairs)
-            {
-                p = Probability(pair.Variant);
-                tFrequency = p * sumFrequency;
-                c1 = Math.Pow(pair.Frequency - tFrequency, 2);
-                c2 = c1 / tFrequency;
-
-                _results.Add(new THypothesisResult(_results.Count + 1, pair.Variant.ToString(), pair.Frequency, p, tFrequency, c1, c2));
-            }
-        }
-
-        protected virtual void BuildSeries(int sumFrequency)
+        protected void BuildSeries(int sumFrequency)
         {
             var p = _results.Select(r => r.Probability);
             var empiricalF = _results.Select(

@@ -1,27 +1,21 @@
 ﻿using MathNet.Numerics.Distributions;
 using System.Linq;
-using System;
 using StatisticalAnalysis.WpfClient.HypothesisTesting.Models;
 
 namespace StatisticalAnalysis.WpfClient.HypothesisTesting
 {
-    public class TBinomial : THypothesis<Variant<int>, Binomial>
+    public class TBinomial : THypothesisOfDiscreteDistribution
     {
         protected override int _r => 2;
 
-        public TBinomial(IVariationPair<Variant<int>>[] discretePairs, double significanceLevel)
-            : base(discretePairs, significanceLevel)
+        public TBinomial(DiscretePair[] pairs, double significanceLevel)
+            : base(pairs, significanceLevel)
         {
-            var sumFrequency = discretePairs.Sum(dPair => dPair.Frequency);
-            var mean = (double)discretePairs.Sum(dPair => dPair.Variant.Value * dPair.Frequency) / sumFrequency;
-            var p = mean / discretePairs.Length;
+            var sumFrequency = pairs.Sum(dPair => dPair.Frequency);
+            var mean = (double)pairs.Sum(dPair => dPair.Variant * dPair.Frequency) / sumFrequency;
+            var p = mean / pairs.Length;
 
-            distribution = new Binomial(p, discretePairs.Length - 1);
-
-            Execute();
+            distribution = new Binomial(p, pairs.Length);
         }
-
-        protected override double Probability(Variant<int> variant) =>
-            distribution.Probability(variant.Value);
     }
 }

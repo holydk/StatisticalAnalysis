@@ -155,7 +155,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
 
                 var varPairs = VariationData.ToVariationPairs();
 
-                if (varPairs == null || varPairs.Any(p => p.Frequency == 0))
+                if (varPairs == null)
                 {
                     //MessageBox.Show("Некорректные данные.");
 
@@ -169,8 +169,17 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
                 SetTHypothesis(varPairs);
 
                 if (THypothesis != null)
-                {                   
-                    IsResult = true;
+                {
+                    try
+                    {
+                        THypothesis.Execute();
+
+                        IsResult = true;
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Произошла непредвиденная ошибка.");
+                    }
                 }
 
                 IsBusy = false;
@@ -191,7 +200,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             }));
         }
 
-        private void SetTHypothesis(ICollection<IVariationPair<object>> varPairs)
+        private void SetTHypothesis(IVariationPair[] varPairs)
         {
             if (!SelectedDistributionType.HasValue) return;
 
@@ -199,23 +208,23 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             {
                 case DistributionType.Binomial:
 
-                    var discretePairs = (IVariationPair<Variant<int>>[])varPairs;
-
+                    var discretePairs = (DiscretePair[])varPairs;
+                    
                     THypothesis = new TBinomial(discretePairs, SelectedSignificanceLevel.Value);
 
                     break;
 
                 case DistributionType.ContinuousUniform:
 
-                    discretePairs = (IVariationPair<Variant<int>>[])varPairs;
+                    var intervals = (СontinuousPair[])varPairs;
 
-                    THypothesis = new TContinuousUniform(discretePairs, SelectedSignificanceLevel.Value);
+                    THypothesis = new TContinuousUniform(intervals, SelectedSignificanceLevel.Value);
 
                     break;
 
                 case DistributionType.Normal:
 
-                    var intervals = (IVariationPair<Variant<Interval>>[])varPairs;
+                    intervals = (СontinuousPair[])varPairs;
 
                     THypothesis = new TNormal(intervals, SelectedSignificanceLevel.Value);
 

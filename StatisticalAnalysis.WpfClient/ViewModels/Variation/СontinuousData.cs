@@ -20,28 +20,44 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
             }
         }
 
-        public override IVariationPair<object>[] ToVariationPairs()
+        protected override void FixParsedData(ICollection<SeriesDatum<double>> data)
         {
-            if (Data == null || Data.Count == 0) return null;
+            var distinctItems = data.Distinct();
+            var avg = distinctItems.Average(d => d.Value);
+            var expectedErrors = data
+                .Where(d => d.Value > avg * 5)
+                .ToArray();
 
-            var varPairs = new HashSet<IVariationPair<Variant<Interval>>>();
+            foreach (var item in expectedErrors)
+            {
+                data.Remove(item);
+            }
+        }
+
+        protected override IVariationPair[] GetVariationPairs()
+        {
+            var varPairs = new HashSet<СontinuousPair>();
             var numberOfIntervals = Statistics.GetNumberOfIntervals(Data.Count);
             var min = Data.Min(datum => datum.Value);
             var max = Data.Max(datum => datum.Value);
             var step = (max - min) / numberOfIntervals;
 
+            double lower;
+            double upper;
+            int frequency;
+
             for (int i = 0; i < numberOfIntervals; i++)
             {
-                var lower = min + (i * step);
-                var upper = lower + step;
+                lower = min + (i * step);
+                upper = lower + step;
+                frequency = Data.Count(varPair => varPair.Value >= lower && varPair.Value <= upper);
 
-                var variant = new Variant<Interval>(new Interval(lower, upper));
-                var frequency = Data.Where(varPair => varPair.Value >= lower && varPair.Value <= upper).Count();
-
-                varPairs.Add(new VariationPair<Variant<Interval>>(variant, frequency));
+                varPairs.Add(new СontinuousPair(new Interval(lower, upper), frequency));
             }
 
-            return varPairs.ToArray();
+            return varPairs
+                .OrderBy(pair => pair.Variant.Middle)
+                .ToArray();
         }
     }
 }

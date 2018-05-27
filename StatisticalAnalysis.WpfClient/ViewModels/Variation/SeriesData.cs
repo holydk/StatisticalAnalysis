@@ -84,32 +84,17 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
 
         protected virtual void FixParsedData(ICollection<TDatum> data) { }
 
-        protected virtual void FixVariationPairs(ICollection<IVariationPair<object>> variationPairs)
+        public IVariationPair[] ToVariationPairs()
         {
-            if (variationPairs.Any(pair => pair.Frequency < 5))
-            {
-                var pairs = variationPairs.ToArray();
+            if (Data == null || Data.Count == 0) return null;
 
-                for (int i = 0; i < pairs.Length; i++)
-                {
-                    if (pairs[i].Frequency >= 5) continue;
-
-                    if (i == 0)
-                    {
-
-                    }
-                    else
-                    {
-
-                    }
-                }
-            }
+            return GetVariationPairs();
         }
+
+        protected abstract IVariationPair[] GetVariationPairs();
 
         public void ClearData() => Data?.Clear();
 
         protected abstract TDatum Parse(string item);
-
-        public abstract IVariationPair<object>[] ToVariationPairs();
     }
 }

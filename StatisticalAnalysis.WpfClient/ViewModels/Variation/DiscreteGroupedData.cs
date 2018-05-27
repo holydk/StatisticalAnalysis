@@ -12,15 +12,13 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
             throw new NotImplementedException();
         }
 
-        public override IVariationPair<object>[] ToVariationPairs()
+        protected override IVariationPair[] GetVariationPairs()
         {
-            if (Data == null || Data.Count == 0) return null;
-
-            var data = new HashSet<IVariationPair<Variant<int>>>();
+            var data = new HashSet<DiscretePair>();
 
             foreach (var item in Data.OrderBy(d => d.Variant))
             {
-                data.Add(new VariationPair<Variant<int>>(new Variant<int>(item.Variant), item.Value));
+                data.Add(new DiscretePair(item.Variant, item.Value));
             }
 
             return data.ToArray();

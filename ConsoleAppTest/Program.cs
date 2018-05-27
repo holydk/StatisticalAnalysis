@@ -11,9 +11,9 @@ namespace ConsoleAppTest
         static void Main(string[] args)
         {
             // Binomial
-            var p = 0.152;
-            var n = 5;
-            var x = 0;
+            var p = 0.174;
+            var n = 6;
+            var x = 5;
             var bCdf = Binomial.CDF(p, n, x);
             var bPmf = Binomial.PMF(p, n, x);
             var bPmfLn = Binomial.PMFLn(p, n, x);
@@ -49,12 +49,12 @@ namespace ConsoleAppTest
 
             // Discrete Uniform
             var sqrtThree = Math.Sqrt(3);
-            var _mean = 2;
-            var _stdDev = 1.47;
-            var lower = (int) Math.Round(_mean - sqrtThree * _stdDev);
-            var upper = (int) Math.Round(_mean + sqrtThree * _stdDev);
-            var u = new DiscreteUniform(lower, upper);
-            var _p = u.Probability(7);
+            var _mean = 2.1;
+            var _stdDev = 1.465;
+            var lower =  (_mean - sqrtThree * _stdDev);
+            var upper =  (_mean + sqrtThree * _stdDev);
+            var u = new ContinuousUniform(lower, upper);
+            var _p = u.Density(1.05);
 
             var h = new Histogram(nSamples, 5);
 
