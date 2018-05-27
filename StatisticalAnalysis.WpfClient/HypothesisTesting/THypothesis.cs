@@ -9,7 +9,9 @@ using System.Linq;
 
 namespace StatisticalAnalysis.WpfClient.HypothesisTesting
 {
-    public abstract class THypothesis
+    public abstract class THypothesis<TPair, TDistribution> : ITHypothesis
+        where TPair : IVariationPair
+        where TDistribution : class, IUnivariateDistribution
     {
         public double SignificanceLevel { get; }
 
@@ -19,10 +21,10 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
         protected double _criticalValue;
         public double CriticalValue => _criticalValue;
 
-        protected ObservableCollection<THypothesisResult> _results;
-        public ObservableCollection<THypothesisResult> Results => _results;
+        protected List<THypothesisResult> _results;
+        public ReadOnlyCollection<THypothesisResult> Results => _results?.AsReadOnly();
 
-        protected IUnivariateDistribution _univariateDistribution;
+        protected TDistribution distribution;
 
         protected SeriesCollection _series;
         public SeriesCollection Series => _series;
@@ -30,45 +32,51 @@ namespace StatisticalAnalysis.WpfClient.HypothesisTesting
         private bool? _isValid = null;
         public bool? IsValid => _isValid;
 
+        protected TPair[] _pairs;
+
         protected abstract int _r { get; }
 
-        public THypothesis(double significanceLevel)
+        public THypothesis(TPair[] pairs, double significanceLevel)
         {
             if (significanceLevel == 0 || significanceLevel >= 1)
                 throw new ArgumentOutOfRangeException(nameof(significanceLevel));
 
             SignificanceLevel = significanceLevel;
-            _results = new ObservableCollection<THypothesisResult>();
+
+            _pairs = pairs ?? throw new ArgumentNullException(nameof(pairs));
+            _results = new List<THypothesisResult>();
             _series = new SeriesCollection();
         }
 
-        protected void Execute<TVariant>(ICollection<IVariationPair<TVariant>> varPairs, Func<TVariant, double> execCdf)
-            where TVariant : class
+        protected abstract double Probability(TPair pair);
+
+        public void Execute()
         {
-            var sumFrequency = varPairs.Sum(p => p.Frequency);
+            var sumFrequency = _pairs.Sum(p => p.Frequency);
 
-            foreach (var pair in varPairs)
+            CalculateStatistics(sumFrequency);
+
+            _empiricalValue = _results.Sum(r => 
             {
-                var p = execCdf(pair.Variant);
-                var tFrequency = p * sumFrequency;
-                var c1 = Math.Pow(pair.Frequency - tFrequency, 2);
-                var c2 = c1 / tFrequency;
+                if (double.IsInfinity(r.Criterion2))               
+                    return 0;               
+                else
+                    return r.Criterion2;
+            });
 
-                _results.Add(new THypothesisResult(_results.Count + 1, pair.Variant.ToString(), pair.Frequency, p, tFrequency, c1, c2));
-            }
-
-            _empiricalValue = _results.Sum(r => r.Criterion2);
-            _criticalValue = ChiSquared.InvCDF(varPairs.Count - _r, 1 - SignificanceLevel);
-
+            _criticalValue = ChiSquared.InvCDF(_results.Count - _r - 1, 1 - SignificanceLevel);
             _isValid = _empiricalValue > _criticalValue ? false : true;
 
             BuildSeries(sumFrequency);
         }
 
-        private void BuildSeries(double sumFrequency)
+        protected abstract void CalculateStatistics(int sumFrequency);
+
+        protected void BuildSeries(int sumFrequency)
         {
             var p = _results.Select(r => r.Probability);
-            var empiricalF = _results.Select(r => (r.EmpiricalFrequency / (r.Probability * sumFrequency)) * r.Probability);
+            var empiricalF = _results.Select(
+                r => (r.EmpiricalFrequency / (r.Probability * sumFrequency)) * r.Probability);
 
             _series.AddRange(new object[]
             {

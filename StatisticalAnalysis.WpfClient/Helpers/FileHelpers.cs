@@ -1,12 +1,11 @@
 ﻿using StatisticalAnalysis.WpfClient.Models;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace StatisticalAnalysis.WpfClient.Helpers
 {
-    public static class FileHelper
+    public static partial class CommonHelpers
     {
         public static FileExtension? GetFileExtension(string fileName) =>
             new FileInfo(fileName).Extension.TrimStart('.').GetFileExtensionByString();

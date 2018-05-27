@@ -30,12 +30,12 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
 
         public async Task FromFileAsync(string fileName)
         {
-            var fileExt = FileHelper.GetFileExtension(fileName);
+            var fileExt = CommonHelpers.GetFileExtension(fileName);
 
             if (!fileExt.HasValue || fileExt != FileExtension.Csv)
                 throw new NotSupportedException("Данный тип файла не поддерживается.");
 
-            var data = await FileHelper.ReadCsvAsync(fileName, ';');
+            var data = await CommonHelpers.ReadCsvAsync(fileName, ';');
 
             FixDefaultErrors(data);
 
@@ -68,8 +68,6 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
             return parsedData;         
         }
 
-        protected virtual void FixParsedData(ICollection<TDatum> data) { }
-
         private void FixDefaultErrors(string[] data)
         {
             for (int i = 0; i < data.Length; i++)
@@ -84,10 +82,19 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
             }
         }
 
+        protected virtual void FixParsedData(ICollection<TDatum> data) { }
+
+        public IVariationPair[] ToVariationPairs()
+        {
+            if (Data == null || Data.Count == 0) return null;
+
+            return GetVariationPairs();
+        }
+
+        protected abstract IVariationPair[] GetVariationPairs();
+
         public void ClearData() => Data?.Clear();
 
         protected abstract TDatum Parse(string item);
-
-        public abstract ICollection<IVariationPair<object>> ToVariationPairs();
     }
 }

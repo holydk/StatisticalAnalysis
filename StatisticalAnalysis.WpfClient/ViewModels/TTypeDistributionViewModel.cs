@@ -21,7 +21,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
 
         public IEnumerable<ICommandItem> CommandItems { get; }
 
-        public IEnumerable<ICommandItem> ResultCommandItems { get; }
+        public ICollection<ICommandItem> ResultCommandItems { get; }
 
         public IEnumerable<double> SignificanceLevels { get; }
 
@@ -57,7 +57,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             set => Set(() => VariationData, value);
         }
 
-        public THypothesis THypothesis
+        public ITHypothesis THypothesis
         {
             get => Get(() => THypothesis);
             set => Set(() => THypothesis, value);
@@ -93,9 +93,12 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
                 new CommandItem("Очистить", MaterialDesignThemes.Wpf.PackIconKind.Delete, new RelayCommand((sender) => VariationData?.ClearData()))
             };
 
-            ResultCommandItems = new ICommandItem[]
+            ResultCommandItems = new List<ICommandItem>();
+
+            _informationItems = new IInformationItem[]
             {
-                new CommandItem("Сохранить", MaterialDesignThemes.Wpf.PackIconKind.ContentSave, SaveResultCommand)
+                new InformationItem("Как ввести данные", "Вы можете ввести данные двумя способами: самостоятельно или загрузить из файла. Поддерживаемые форматы: *.csv. При загрузке данных учитывается тип вариационного ряда."),
+                new InformationItem("Хотите сохранить результат?", "Сохранить вычисленные данные, включая график, вы можете в форматы: *.docx, *.xlsx, *.pdf.")
             };
         }
 
@@ -135,6 +138,10 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
                             // Invalid Convert
                             MessageBox.Show(invOpEx.Message);
                         }
+                        catch
+                        {
+                            MessageBox.Show("Произошла непредвиденная ошибка.");
+                        }
                     }
                 }
             }));
@@ -148,7 +155,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
 
                 var varPairs = VariationData.ToVariationPairs();
 
-                if (varPairs == null || varPairs.Any(p => p.Frequency == 0))
+                if (varPairs == null)
                 {
                     //MessageBox.Show("Некорректные данные.");
 
@@ -163,9 +170,20 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
 
                 if (THypothesis != null)
                 {
-                    IsBusy = false;
-                    IsResult = true;
+                    try
+                    {
+                        THypothesis.Execute();
+
+                        IsResult = true;
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Произошла непредвиденная ошибка.");
+                    }
                 }
+
+                IsBusy = false;
+
             }, () => !IsBusy && VariationData != null && SelectedDistributionType != null && SelectedDistributionSeriesInputType != null && SelectedSignificanceLevel != null));
         }
 
@@ -182,15 +200,7 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             }));
         }
 
-        public ICommand SaveResultCommand
-        {
-            get => Get(() => SaveResultCommand, new RelayCommand((sender) =>
-            {
-                
-            }));
-        }
-
-        private void SetTHypothesis(ICollection<IVariationPair<object>> varPairs)
+        private void SetTHypothesis(IVariationPair[] varPairs)
         {
             if (!SelectedDistributionType.HasValue) return;
 
@@ -198,23 +208,23 @@ namespace StatisticalAnalysis.WpfClient.ViewModels
             {
                 case DistributionType.Binomial:
 
-                    var discretePairs = (ICollection<IVariationPair<Variant<int>>>)varPairs;
-
+                    var discretePairs = (DiscretePair[])varPairs;
+                    
                     THypothesis = new TBinomial(discretePairs, SelectedSignificanceLevel.Value);
 
                     break;
 
-                case DistributionType.DiscreteUniform:
+                case DistributionType.ContinuousUniform:
 
-                    discretePairs = (ICollection<IVariationPair<Variant<int>>>)varPairs;
+                    var intervals = (СontinuousPair[])varPairs;
 
-                    THypothesis = new TDiscreteUniform(discretePairs, SelectedSignificanceLevel.Value);
+                    THypothesis = new TContinuousUniform(intervals, SelectedSignificanceLevel.Value);
 
                     break;
 
                 case DistributionType.Normal:
 
-                    var intervals = (ICollection<IVariationPair<Variant<Interval>>>)varPairs;
+                    intervals = (СontinuousPair[])varPairs;
 
                     THypothesis = new TNormal(intervals, SelectedSignificanceLevel.Value);
 

@@ -1,9 +1,9 @@
 ﻿namespace StatisticalAnalysis.WpfClient.HypothesisTesting.Models
 {
-    public interface IVariationPair<out TVariant>
-        where TVariant : class
+    public interface IVariationPair
     {
-        TVariant Variant { get; }
         int Frequency { get; }
+
+        void Merge(IVariationPair variationPair);
     }
 }

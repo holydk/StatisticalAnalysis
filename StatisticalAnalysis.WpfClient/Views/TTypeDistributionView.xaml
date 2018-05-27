@@ -20,7 +20,6 @@
         <helpers:IntervalStringConverter x:Key="intervalStringConverter"/>
         <helpers:DistributionTypeToDistributionSeriesTypeConverter x:Key="distributionTypeToDistributionSeriesTypeConverter"/>
         <mdconverters:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" NullValue="Hidden" NotNullValue="Visible"/>
-        <mdconverters:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" FalseValue="Collapsed" TrueValue="Visible"/>
 
         <Style x:Key="dataGridTextBlock" TargetType="{x:Type TextBlock}">
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -195,7 +194,8 @@
             <Setter Property="Content">
                 <Setter.Value>
 
-                    <Grid Style="{StaticResource resultGridStyle}">
+                    <Grid x:Name="PART_gridResult"
+                          Style="{StaticResource resultGridStyle}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
                             <RowDefinition/>
@@ -233,16 +233,19 @@
 
                                     </Button>
                                     
-                                    <StackPanel Grid.Column="1"
+                                    <StackPanel x:Name="PART_stackPanelHeader"
+                                                Grid.Column="1"
                                                 Orientation="Vertical"
                                                 Margin="36 0 0 0">
 
-                                        <TextBlock Text="Проверка гипотезы"
+                                        <TextBlock x:Name="TitleResult"
+                                                   Text="Проверка гипотезы"
                                                    TextTrimming="CharacterEllipsis"
                                                    FontSize="22"
                                                    Style="{StaticResource MaterialDesignTitleTextBlock}"/>
 
-                                        <TextBlock Opacity=".5"
+                                        <TextBlock x:Name="CaptionResult"
+                                                   Opacity=".5"
                                                    TextTrimming="CharacterEllipsis">
                                             <Run Text="{Binding SelectedDistributionType, Converter={StaticResource enumToDescriptionConverter}}"/> распределение при уровне значимости <Run Text="{Binding SelectedSignificanceLevel}"/>.
                                         </TextBlock>
@@ -320,7 +323,8 @@
                                           VerticalScrollBarVisibility="Hidden"
                                           x:Name="PART_resultScrollViewer">
 
-                                <StackPanel Orientation="Vertical">
+                                <StackPanel x:Name="PART_stackPanelResult"
+                                            Orientation="Vertical">
 
                                     <materialDesign:ColorZone Mode="Light"
                                                               Padding="24"
@@ -328,10 +332,12 @@
                                                               BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}">
                                         <StackPanel Orientation="Vertical">
 
-                                            <TextBlock Text="Статистика вариационного ряда"
+                                            <TextBlock x:Name="TitleVarSeries"
+                                                       Text="Статистика вариационного ряда"
                                                        Style="{StaticResource MaterialDesignTitleTextBlock}"/>
 
-                                            <TextBlock Opacity=".5">
+                                            <TextBlock x:Name="CaptionVarSeries"
+                                                       Opacity=".5">
                                                 По критерию согласия Пирсона.
                                             </TextBlock>
 
@@ -359,7 +365,8 @@
                                                 </InlineUIContainer>
                                             </TextBlock>
 
-                                            <DataGrid Style="{StaticResource MaterialDesignDataGrid}"
+                                            <DataGrid x:Name="PART_dataGridResult"
+                                                      Style="{StaticResource MaterialDesignDataGrid}"
                                                       Focusable="False"
                                                       IsHitTestVisible="True"
                                             VerticalAlignment="Center"
@@ -563,12 +570,14 @@
                                                 Поэтому критическая область для этой статистики всегда правосторонняя: [K<Run Text="крит." BaselineAlignment="Subscript"/> ; +∞).
                                             </TextBlock>
 
-                                            <TextBlock Margin="0,16,0,16" 
+                                            <TextBlock x:Name="CritEmpResultTb"
+                                                       Margin="0,16,0,16" 
                                                        HorizontalAlignment="Center">
                                                 K<Run Text="крит." BaselineAlignment="Subscript"/> = <Run Text="{Binding THypothesis.CriticalValue, Mode=OneWay, StringFormat={}{0:F2}}"/>, K<Run Text="набл." BaselineAlignment="Subscript"/> = <Run Text="{Binding THypothesis.EmpiricalValue, Mode=OneWay, StringFormat={}{0:F2}}"/>
                                             </TextBlock>
 
-                                            <TextBlock TextWrapping="Wrap">
+                                            <TextBlock x:Name="CritEmpConclusionTb" 
+                                                       TextWrapping="Wrap">
                                                 Наблюдаемое значение статистики Пирсона 
                                                 <Run>
                                                     <Run.Style>
@@ -655,14 +664,17 @@
 
                                         <StackPanel Orientation="Vertical">
 
-                                            <TextBlock Text="Графическое представление статистики"
-                                                    Style="{StaticResource MaterialDesignTitleTextBlock}"/>
+                                            <TextBlock x:Name="TitleChartTb"
+                                                       Text="Графическое представление статистики"
+                                                       Style="{StaticResource MaterialDesignTitleTextBlock}"/>
 
-                                            <TextBlock Opacity=".5">
+                                            <TextBlock x:Name="CaptionChartTb"
+                                                       Opacity=".5">
                                                 Полигон эмпирических частот и вероятности распределения.
                                             </TextBlock>
 
-                                            <lvc:CartesianChart Series="{Binding THypothesis.Series}" 
+                                            <lvc:CartesianChart x:Name="chartResult"
+                                                                Series="{Binding THypothesis.Series}" 
                                                             LegendLocation="Top"
                                                             Margin="0 24 0 24"
                                                             HorizontalAlignment="Center"
@@ -812,6 +824,217 @@
 
         </DataTemplate>
 
+        <!--<ControlTemplate x:Key="InputContentControlTemplate" TargetType="{x:Type ContentControl}">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Border BorderBrush="{DynamicResource MaterialDesignDarkSeparatorBackground}"
+                        BorderThickness="0 0 1 0"
+                        Style="{StaticResource leftInputBorderStyle}"
+                        x:Name="PART_inputData"
+                        Margin="0"
+                        Opacity="1">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <materialDesign:PopupBox Grid.Row="0"
+                                                 Margin="12 12 12 0"
+                                                 Panel.ZIndex="1"
+                                                 HorizontalAlignment="Right"
+                                                 PlacementMode="BottomAndAlignLeftEdges" 
+                                                 StaysOpen="False">
+                            <materialDesign:PopupBox.ToggleContent>
+
+                                <materialDesign:PackIcon Kind="DotsHorizontal"
+                                                         Opacity="0.5"/>
+
+                            </materialDesign:PopupBox.ToggleContent>
+
+                            <ItemsControl ItemsSource="{Binding CommandItems}"
+                                          VirtualizingStackPanel.IsVirtualizing="True"
+                                          VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                          ScrollViewer.CanContentScroll="True">
+                                <ItemsControl.ItemTemplate>
+
+                                    <DataTemplate DataType="{x:Type models:ICommandItem}">
+
+                                        <Button Height="40"
+                                                Padding="12 0 12 0"
+                                                HorizontalContentAlignment="Left"
+                                                ToolTip="{Binding ToolTip}" 
+                                                ToolTipService.InitialShowDelay="0" 
+                                                Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                                                Style="{DynamicResource MaterialDesignFlatButton}"
+                                                Command="{Binding Command}">
+
+                                            <StackPanel Orientation="Horizontal"
+                                                        VerticalAlignment="Center">
+
+                                                <materialDesign:PackIcon Kind="{Binding IconKind}" />
+
+                                                <TextBlock Margin="12 0 0 0"
+                                                           VerticalAlignment="Center"
+                                                           FontSize="14"
+                                                           Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                                           Text="{Binding Title, Mode=OneWay}"/>
+
+                                            </StackPanel>
+
+                                        </Button>
+
+                                    </DataTemplate>
+
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel Orientation="Vertical" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+
+                        </materialDesign:PopupBox>
+
+                        <ContentControl Grid.Row="1" 
+                                        Content="{Binding VariationData}"/>
+
+                    </Grid>
+
+                </Border>
+
+                <StackPanel x:Name="PART_inputParams" 
+                            Grid.Column="1"                                              
+                            Orientation="Vertical" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center">
+
+                    <WrapPanel HorizontalAlignment="Center"
+                               Margin="12 48 12 24">
+
+                        <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                  materialDesign:HintAssist.Hint="Тип распределения"
+                                  Width="200"
+                                  Margin="12 0 12 0"
+                                  VerticalAlignment="Top"
+                                  HorizontalAlignment="Left"
+                                  SelectedItem="{Binding SelectedDistributionType}"
+                                  ItemsSource="{Binding DistributionTypes}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+
+                        <materialDesign:TransitioningContent Style="{StaticResource inputFieldsTransitioningContentStyle}"
+                                                             Visibility="{Binding SelectedDistributionType, Converter={StaticResource NullableToVisibilityConverter}}">
+                            <materialDesign:TransitioningContent.OpeningEffects>
+                                <materialDesign:TransitionEffect Kind="SlideInFromRight"/>
+                                <materialDesign:TransitionEffect Kind="FadeIn"/>
+                            </materialDesign:TransitioningContent.OpeningEffects>
+
+                            <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                      materialDesign:HintAssist.Hint="Уровень значимости"
+                                      Width="200"
+                                      Margin="12 0 12 0"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Left"
+                                      SelectedItem="{Binding SelectedSignificanceLevel}"
+                                      ItemsSource="{Binding SignificanceLevels}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+
+                        </materialDesign:TransitioningContent>
+
+                        <materialDesign:TransitioningContent Style="{StaticResource inputFieldsTransitioningContentStyle}"
+                                                             Visibility="{Binding SelectedSignificanceLevel, Converter={StaticResource NullableToVisibilityConverter}}">
+                            <materialDesign:TransitioningContent.OpeningEffects>
+                                <materialDesign:TransitionEffect Kind="SlideInFromRight"/>
+                                <materialDesign:TransitionEffect Kind="FadeIn"/>
+                            </materialDesign:TransitioningContent.OpeningEffects>
+
+                            <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                      materialDesign:HintAssist.Hint="Тип ряда"
+                                      Width="200"
+                                      Margin="12 0 12 0"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Left"
+                                      SelectedItem="{Binding SelectedDistributionSeriesInputType}"
+                                      ItemsSource="{Binding DistributionSeriesInputTypes}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Converter={StaticResource enumToDescriptionConverter}}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+
+                        </materialDesign:TransitioningContent>
+
+                    </WrapPanel>
+
+                    <Button Margin="12"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+                            Command="{Binding CalculateVariationDataCommand}">
+
+                        <materialDesign:PackIcon Kind="ChevronUp"/>
+
+                    </Button>
+
+                </StackPanel>
+
+            </Grid>
+
+            <ControlTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="true">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin"
+                                                    Storyboard.TargetName="PART_inputData"
+                                                    Duration="0:0:0.4"
+                                                    To="0 -201 0 0">
+                                    <ThicknessAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </ThicknessAnimation.EasingFunction>
+                                </ThicknessAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                 Storyboard.TargetName="PART_inputData"
+                                                 Duration="0:0:0.4"
+                                                 To="0">
+                                    <DoubleAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseOut" />
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                </DataTrigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>-->
+        
     </UserControl.Resources>
 
     <Grid>

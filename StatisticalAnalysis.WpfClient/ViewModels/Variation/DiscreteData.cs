@@ -33,22 +33,23 @@ namespace StatisticalAnalysis.WpfClient.ViewModels.Variation
             }
         }
 
-        public override ICollection<IVariationPair<object>> ToVariationPairs()
+        protected override IVariationPair[] GetVariationPairs()
         {
-            if (Data == null || Data.Count == 0) return null;
-
             var distinctItems = Data.Distinct();
-            var varPairs = new HashSet<IVariationPair<Variant<int>>>();
+            var varPairs = new HashSet<DiscretePair>();
+
+            int frequency;
 
             foreach (var item in distinctItems)
             {
-                var variant = new Variant<int>(item.Value);
-                var frequency = Data.Count(d => d.Value == item.Value);
+                frequency = Data.Count(d => d.Value == item.Value);
 
-                varPairs.Add(new VariationPair<Variant<int>>(variant, frequency));
+                varPairs.Add(new DiscretePair(item.Value, frequency));
             }
 
-            return varPairs.OrderBy(varPair => varPair.Variant.Value).ToArray();
+            return varPairs
+                .OrderBy(pair => pair.Variant)
+                .ToArray();
         }
     }
 }
