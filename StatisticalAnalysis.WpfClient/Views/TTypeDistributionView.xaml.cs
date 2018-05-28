@@ -19,7 +19,6 @@ using StatisticalAnalysis.WpfClient.HypothesisTesting.Models;
 using LiveCharts.Wpf;
 using System.Linq;
 using MaterialDesignThemes.Wpf;
-using System.Windows.Documents;
 
 namespace StatisticalAnalysis.WpfClient.Views
 {
@@ -184,6 +183,16 @@ namespace StatisticalAnalysis.WpfClient.Views
 
             if (!fileExt.HasValue) return;
 
+            var titleResult = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "TitleResult");
+            var captionResult = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "CaptionResult");
+            var titleVarSeries = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "TitleVarSeries");
+            var captionVarSeries = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "CaptionVarSeries");
+            var critEmpResultTb = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "CritEmpResultTb");
+            var critEmpConclusionTb = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "CritEmpConclusionTb");
+            var titleChartTb = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "TitleChartTb");
+            var captionChartTb = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "CaptionChartTb");
+            var chart = CommonHelpers.FindChild<CartesianChart>(PART_resultContentControl, "chartResult");
+
             switch (fileExt.Value)
             {
                 case FileExtension.Docx:
@@ -195,23 +204,173 @@ namespace StatisticalAnalysis.WpfClient.Views
                             "Ошибка сохранения в формат *.docx. Возможно у вас не установлен Microsoft Word.");
 
                     Word.Document wDoc = null;
+                    Word.Table table = null;
+                    Word.Range wCurRange = null;
+                    Word.Paragraph wParagraph = null;             
 
                     try
                     {
                         wDoc = wApp.Documents.Add();
 
+                        if (titleResult != null)
+                        {
+                            wParagraph = wDoc.Content.Paragraphs.Add();
+                            wParagraph.Range.Font.Size = 16;
+                            wParagraph.Range.Text = titleResult.Text;
+                            wParagraph.Range.InsertParagraphAfter(); 
+                        }
 
+                        if (captionResult != null)
+                        {
+                            wParagraph = wDoc.Content.Paragraphs.Add();
+                            wParagraph.Range.Font.Size = 14;
 
+                            var text = string.Empty;
 
+                            foreach (var item in captionResult.Inlines)
+                            {
+                                text += (item as System.Windows.Documents.Run).Text;
+                            }
 
+                            wParagraph.Range.Text = text + "\n";
+                            wParagraph.Range.InsertParagraphAfter();
+                        }
 
-                        wDoc.Close(true);
+                        if (titleVarSeries != null)
+                        {
+                            wParagraph = wDoc.Content.Paragraphs.Add();
+                            wParagraph.Range.Font.Size = 16;
+                            wParagraph.Range.Text = titleVarSeries.Text;
+                            wParagraph.Range.InsertParagraphAfter();
+                        }
+
+                        if (captionVarSeries != null)
+                        {
+                            wParagraph = wDoc.Content.Paragraphs.Add();
+                            wParagraph.Range.Font.Size = 14;
+                            wParagraph.Range.Text = captionVarSeries.Text + "\n";
+                            wParagraph.Range.InsertParagraphAfter();
+                        }
+
+                        //xlWorkSheet.Cells[++curRowsCount, 1] = "№";
+                        //xlWorkSheet.Cells[curRowsCount, 2] = "Интервал";
+                        //xlWorkSheet.Cells[curRowsCount, 3] = "Эмп. частоты\nni";
+                        //xlWorkSheet.Cells[curRowsCount, 4] = "Вероятности\npi";
+                        //xlWorkSheet.Cells[curRowsCount, 5] = "Теор. частоты\nn*pi";
+                        //xlWorkSheet.Cells[curRowsCount, 6] = "(ni - n*pi)^2";
+                        //xlWorkSheet.Cells[curRowsCount, 7] = "(ni - n*pi)^2/(n*pi)";
+
+                        //xlCurRange = xlWorkSheet.Cells[curRowsCount, 7];
+                        //xlCurRange.WrapText = true;
+
+                        //var properties = typeof(THypothesisResult).GetProperties();
+                        //var results = ViewModel.THypothesis.Results;
+
+                        //for (int i = 0; i < results.Count; i++, curRowsCount++)
+                        //{
+                        //    for (int j = 0; j < properties.Length; j++)
+                        //    {
+                        //        xlWorkSheet.Cells[curRowsCount + 1, j + 1] = properties[j].GetValue(results[i]);
+                        //    }
+                        //}
+
+                        var properties = typeof(THypothesisResult).GetProperties();
+                        var results = ViewModel.THypothesis.Results;
+                        table = wDoc.Tables.Add(wParagraph.Range, results.Count + 1, properties.Length);
+
+                        table.Rows[1].Cells[1].Range.Text = "№";
+                        table.Rows[1].Cells[2].Range.Text = "Интервал";
+                        table.Rows[1].Cells[3].Range.Text = "Эмп. частоты\nni";
+                        table.Rows[1].Cells[4].Range.Text = "Вероятности\npi";
+                        table.Rows[1].Cells[5].Range.Text = "Теор. частоты\nn*pi";
+                        table.Rows[1].Cells[6].Range.Text = "(ni - n*pi)^2";
+                        table.Rows[1].Cells[7].Range.Text = "(ni - n*pi)^2/(n*pi)";
+
+                        for (int i = 1; i < results.Count; i++)
+                        {
+                            for (int j = 0; j < properties.Length; j++)
+                            {
+                                table.Rows[i + 1].Cells[j + 1].Range.Text = properties[j].GetValue(results[i]).ToString();
+                            }
+                        }
+
+                        if (critEmpResultTb != null)
+                        {
+                            wParagraph = wDoc.Content.Paragraphs.Add();
+                            wParagraph.Range.Font.Size = 16;
+
+                            var text = string.Empty;
+
+                            foreach (var item in critEmpResultTb.Inlines)
+                            {
+                                text += (item as System.Windows.Documents.Run).Text;
+                            }
+
+                            wParagraph.Range.Text = text + "\n";
+                            wParagraph.Range.InsertParagraphAfter();
+                        }
+
+                        if (critEmpConclusionTb != null)
+                        {
+                            wParagraph = wDoc.Content.Paragraphs.Add();
+                            wParagraph.Range.Font.Size = 14;
+
+                            var text = string.Empty;
+
+                            foreach (var item in critEmpConclusionTb.Inlines)
+                            {
+                                text += (item as System.Windows.Documents.Run).Text;
+                            }
+
+                            wParagraph.Range.Text = text + "\n";
+                            wParagraph.Range.InsertParagraphAfter();
+                        }
+
+                        if (titleChartTb != null)
+                        {
+                            wParagraph = wDoc.Content.Paragraphs.Add();
+                            wParagraph.Range.Font.Size = 16;
+                            wParagraph.Range.Text = titleChartTb.Text;
+                            wParagraph.Range.InsertParagraphAfter();
+                        }
+
+                        if (captionChartTb != null)
+                        {
+                            wParagraph = wDoc.Content.Paragraphs.Add();
+                            wParagraph.Range.Font.Size = 14;
+                            wParagraph.Range.Text = captionChartTb.Text + "\n";
+                            wParagraph.Range.InsertParagraphAfter();
+                        }
+
+                        if (chart != null)
+                        {
+                            using (var mStream = chart.ToImageStream(new Thickness(12)))
+                            {
+                                var imgChart = System.Drawing.Image.FromStream(mStream);
+
+                                System.Windows.Forms.Clipboard.SetDataObject(imgChart);
+                                wParagraph.Range.Paste();
+                            }
+                        }
+
+                        wCurRange = wDoc.Range(0, 0);                        
+
+                        wDoc.SaveAs2(fileName);
+                        wDoc.Close();
                     }
                     finally
                     {
+                        wApp.Quit();
+
+                        Marshal.ReleaseComObject(wParagraph);
+                        Marshal.ReleaseComObject(wCurRange);
+                        Marshal.ReleaseComObject(table);
                         Marshal.ReleaseComObject(wDoc);
                         Marshal.ReleaseComObject(wApp);
 
+                        wParagraph = null;
+                        wCurRange = null;
+                        table = null;
                         wDoc = null;
                         wApp = null;
 
@@ -237,13 +396,15 @@ namespace StatisticalAnalysis.WpfClient.Views
                         xlWorkBook = xlApp.Workbooks.Add();
                         xlWorkSheet = (Excel.Worksheet)xlWorkBook.Sheets[1];
 
-                        var titleResult = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "TitleResult");
-                        var captionResult = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "CaptionResult");
                         var curRowsCount = 1;
 
-                        xlCurRange = xlWorkSheet.Cells[curRowsCount, 1];
-                        xlCurRange.Font.Size = 16;
-                        xlCurRange.Value2 = titleResult?.Text ?? "";
+                        if (titleResult != null)
+                        {
+                            xlCurRange = xlWorkSheet.Cells[curRowsCount, 1];
+                            xlCurRange.Font.Size = 16;
+                            xlCurRange.Value2 = titleResult.Text;
+
+                        }
 
                         if (captionResult != null)
                         {
@@ -252,27 +413,24 @@ namespace StatisticalAnalysis.WpfClient.Views
 
                             foreach (var item in captionResult.Inlines)
                             {
-                                xlCurRange.Value2 += (item as Run).Text;
+                                xlCurRange.Value2 += (item as System.Windows.Documents.Run).Text;
                             }
                         }
 
                         curRowsCount++;
 
-                        var titleVarSeries = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "TitleVarSeries");
-                        var captionVarSeries = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "CaptionVarSeries");
-
                         if (titleVarSeries != null)
                         {
                             xlCurRange = xlWorkSheet.Cells[++curRowsCount, 1];
                             xlCurRange.Font.Size = 16;
-                            xlCurRange.Value2 = titleVarSeries?.Text ?? "";
+                            xlCurRange.Value2 = titleVarSeries.Text;
                         }
 
                         if (captionVarSeries != null)
                         {
                             xlCurRange = xlWorkSheet.Cells[++curRowsCount, 1];
                             xlCurRange.Font.Size = 14;
-                            xlCurRange.Value2 = captionVarSeries?.Text ?? "";
+                            xlCurRange.Value2 = captionVarSeries.Text;
                         }
 
                         xlWorkSheet.Cells[++curRowsCount, 1] = "№";
@@ -299,9 +457,6 @@ namespace StatisticalAnalysis.WpfClient.Views
 
                         curRowsCount++;
 
-                        var critEmpResultTb = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "CritEmpResultTb");
-                        var critEmpConclusionTb = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "CritEmpConclusionTb");
-
                         if (critEmpResultTb != null)
                         {
                             xlCurRange = xlWorkSheet.Cells[++curRowsCount, 1];
@@ -309,7 +464,7 @@ namespace StatisticalAnalysis.WpfClient.Views
 
                             foreach (var item in critEmpResultTb.Inlines)
                             {
-                                xlCurRange.Value2 += (item as Run).Text;
+                                xlCurRange.Value2 += (item as System.Windows.Documents.Run).Text;
                             }
                         }
 
@@ -320,30 +475,25 @@ namespace StatisticalAnalysis.WpfClient.Views
 
                             foreach (var item in critEmpConclusionTb.Inlines)
                             {
-                                xlCurRange.Value2 += (item as Run).Text;
+                                xlCurRange.Value2 += (item as System.Windows.Documents.Run).Text;
                             }
                         }
 
                         curRowsCount++;
 
-                        var titleChartTb = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "TitleChartTb");
-                        var captionChartTb = CommonHelpers.FindChild<TextBlock>(PART_resultContentControl, "CaptionChartTb");
-
                         if (titleChartTb != null)
                         {
                             xlCurRange = xlWorkSheet.Cells[++curRowsCount, 1];
                             xlCurRange.Font.Size = 16;
-                            xlCurRange.Value2 = titleChartTb?.Text ?? "";
+                            xlCurRange.Value2 = titleChartTb.Text;
                         }
 
                         if (captionChartTb != null)
                         {
                             xlCurRange = xlWorkSheet.Cells[++curRowsCount, 1];
                             xlCurRange.Font.Size = 14;
-                            xlCurRange.Value2 = captionChartTb?.Text ?? "";
+                            xlCurRange.Value2 = captionChartTb.Text;
                         }
-
-                        var chart = CommonHelpers.FindChild<CartesianChart>(PART_resultContentControl, "chartResult");
 
                         if (chart != null)
                         {
@@ -358,7 +508,7 @@ namespace StatisticalAnalysis.WpfClient.Views
                         }
 
                         xlWorkBook.SaveAs(fileName);
-                        xlWorkBook.Close(true);
+                        xlWorkBook.Close();
                     }
                     finally
                     {
@@ -391,36 +541,118 @@ namespace StatisticalAnalysis.WpfClient.Views
                         doc.Open();
 
                         var baseFont = BaseFont.CreateFont("C:\\Windows\\Fonts\\arial.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                        var fontHeader = new Font(baseFont, 14, Font.BOLD);
-                        var title = new PdfPCell()
+                        var fontHeader = new Font(baseFont, 16, Font.NORMAL);
+                        var fontNormal = new Font(baseFont, 14, Font.NORMAL);
+
+                        if (titleResult != null)
                         {
-                            Phrase = new Phrase("Проверка гипотезы"),
-                            Border = 0,
-                            PaddingLeft = 5,
-                            PaddingRight = 5,
-                            PaddingTop = 10,
-                            PaddingBottom = 10
-                        };
+                            doc.Add(new Paragraph(titleResult.Text, fontHeader));
+                        }
 
-                        doc.Add(new Phrase("Проверка гипотезы"));
-
-                        var contentResult = CommonHelpers.FindChild<StackPanel>(PART_resultContentControl, "PART_stackPanelResult");
-
-                        if (contentResult != null)
+                        if (captionResult != null)
                         {
-                            var percentScale = 100;
-                            var imgData = contentResult.ToImageBytes();
-                            var imgResult = iTextSharp.text.Image.GetInstance(imgData);
-                            imgResult.Alignment = Element.ALIGN_CENTER;
-                            imgResult.SpacingBefore = 50;
+                            var data = string.Empty;
 
-                            while (imgResult.ScaledHeight > writer.PageSize.Height - 50 ||
-                                   imgResult.ScaledWidth > writer.PageSize.Width)
+                            foreach (var item in captionResult.Inlines)
                             {
-                                imgResult.ScalePercent(percentScale--);
+                                data += (item as System.Windows.Documents.Run).Text;
                             }
 
-                            doc.Add(imgResult); 
+                            var captRes = new Paragraph(data, fontNormal)
+                            {
+                                SpacingAfter = 20
+                            };
+
+                            doc.Add(captRes);
+                        }
+
+                        if (titleVarSeries != null)
+                        {
+                            doc.Add(new Paragraph(titleVarSeries.Text, fontHeader));
+                        }
+
+                        if (captionVarSeries != null)
+                        {
+                            doc.Add(new Paragraph(captionVarSeries.Text, fontNormal));
+                        }
+
+                        var properties = typeof(THypothesisResult).GetProperties();
+                        var results = ViewModel.THypothesis.Results;
+                        var tableResult = new PdfPTable(properties.Length)
+                        {
+                            SpacingBefore = 20,
+                            SpacingAfter = 20
+                        };
+
+                        tableResult.AddCell("№");
+                        tableResult.AddCell("Интервал");
+                        tableResult.AddCell("Эмп. частоты\nni");
+                        tableResult.AddCell("Вероятности\npi");
+                        tableResult.AddCell("Теор. частоты\nn*pi");
+                        tableResult.AddCell("(ni - n*pi)^2");
+                        tableResult.AddCell("(ni - n*pi)^2/(n*pi)");
+
+                        for (int i = 0; i < results.Count; i++)
+                        {
+                            for (int j = 0; j < properties.Length; j++)
+                            {
+                                tableResult.AddCell(properties[j].GetValue(results[i]).ToString());
+                            }
+                        }
+
+                        doc.Add(tableResult);
+
+                        if (critEmpResultTb != null)
+                        {
+                            var data = string.Empty;
+
+                            foreach (var item in critEmpResultTb.Inlines)
+                            {
+                                data += (item as System.Windows.Documents.Run).Text;
+                            }
+
+                            doc.Add(new Paragraph(data, fontHeader));
+                        }
+
+                        if (critEmpConclusionTb != null)
+                        { 
+
+                            var data = string.Empty;
+
+                            foreach (var item in critEmpConclusionTb.Inlines)
+                            {
+                                data += (item as System.Windows.Documents.Run).Text;
+                            }
+
+                            var critEmpConcl = new Paragraph(data, fontNormal)
+                            {
+                                SpacingBefore = 20,
+                                SpacingAfter = 20
+                            };
+
+                            doc.Add(critEmpConcl);
+                        }
+
+                        if (titleChartTb != null)
+                        {
+                            doc.Add(new Paragraph(titleChartTb.Text, fontHeader));
+                        }
+
+                        if (captionChartTb != null)
+                        { 
+                            doc.Add(new Paragraph(captionChartTb.Text, fontNormal));
+                        }
+
+                        if (chart != null)
+                        {
+                            var imgData = chart.ToImageBytes();
+                            var imgResult = iTextSharp.text.Image.GetInstance(imgData);
+                            imgResult.Alignment = Element.ALIGN_CENTER;
+                            imgResult.SpacingBefore = 20;
+
+                            imgResult.ScalePercent(70);
+
+                            doc.Add(imgResult);
                         }
                     }
                     finally
