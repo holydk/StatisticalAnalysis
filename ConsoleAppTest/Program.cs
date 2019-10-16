@@ -105,6 +105,7 @@ namespace ConsoleAppTest
             // output = p under Standard Normal curve from -inf to z
             // e.g., if z = 0.0, function returns 0.5000
             // ACM Algorithm #209
+            // test
             double y; // 209 scratch variable
             double p; // result. called 'z' in 209
             double w; // 209 scratch variable
